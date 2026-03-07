@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WinOS - My Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="desktop-area">
+        <div class="icons">
+            <div class="item" onclick="launch('notes')">
+                <img src="./img/notepad.png">
+                <span>Notepad</span>
+            </div>
+            <div class="item" onclick="launch('calc')">
+                <img src="./img/calculator.png">
+                <span>Calculator</span>
+            </div>
+            <div class="item" onclick="launch('browser')">
+                <img src="./img/chrome.png">
+                <span>Not Google Chrome</span>
+            </div>
+            <div class="item" onclick="launch('settings')">
+                <img src="./img/settings.png">
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <div id="win-main" class="hidden">
+            <div class="win-top">
+                <span id="win-name">App</span>
+                <div class="win-btns">
+                    <button class="w-btn" onclick="console.log('min')">-</button>
+                    <button class="w-btn" onclick="fullScreen()">□</button>
+                    <button class="w-btn x-btn" id="close-it">×</button>
+                </div>
+            </div>
+            <div id="win-body">
+                </div>
+        </div>
+
+        <div class="bar">
+            <button class="start"><img src="./img/start.png" width="20"></button>
+            <div class="os-name">WinOS 1.0</div>
+            <div id="the-time">00:00</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

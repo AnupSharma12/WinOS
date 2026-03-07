@@ -1,0 +1,87 @@
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    /* Use your local wallpaper */
+    background: url('./img/wallpaper.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.icons {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100px;
+}
+
+.item {
+    text-align: center;
+    cursor: pointer;
+}
+
+.item img { width: 45px; height: 45px; }
+.item span {
+    display: block;
+    color: white;
+    font-size: 11px;
+    text-shadow: 1px 1px 2px black;
+    margin-top: 5px;
+}
+
+/* WINDOW STYLES */
+#win-main {
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    width: 550px;
+    height: 380px;
+    background: white;
+    border: 1px solid #666;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden { display: none !important; }
+
+.win-top {
+    height: 30px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.win-btns { display: flex; height: 100%; }
+.w-btn {
+    width: 40px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+}
+.w-btn:hover { background: #eee; }
+.x-btn:hover { background: #e81123 !important; color: white; }
+
+#win-body { padding: 15px; flex: 1; overflow: auto; }
+
+/* TASKBAR */
+.bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: white;
+}
+
+.os-name { margin-left: 10px; font-weight: bold; }
+#the-time { margin-left: auto; font-size: 13px; }
