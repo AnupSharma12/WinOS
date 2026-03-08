@@ -2,51 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WinOS - My Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="desktop-area">
-        <div class="icons">
-            <div class="item" onclick="launch('notes')">
-                <img src="./img/notepad.png">
-                <span>Notepad</span>
-            </div>
-            <div class="item" onclick="launch('calc')">
-                <img src="./img/calculator.png">
-                <span>Calculator</span>
-            </div>
-            <div class="item" onclick="launch('browser')">
-                <img src="./img/chrome.png">
-                <span>Not Google Chrome</span>
-            </div>
-            <div class="item" onclick="launch('settings')">
-                <img src="./img/settings.png">
-                <span>Settings</span>
-            </div>
-        </div>
+<!-- Main View -->
+<div class="desktop" id="desktop">
 
-        <div id="win-main" class="hidden">
-            <div class="win-top">
-                <span id="win-name">App</span>
-                <div class="win-btns">
-                    <button class="w-btn" onclick="console.log('min')">-</button>
-                    <button class="w-btn" onclick="fullScreen()">□</button>
-                    <button class="w-btn x-btn" id="close-it">×</button>
-                </div>
-            </div>
-            <div id="win-body">
-                </div>
+    <!-- Desktop Icons -->
+    <div class="icon-column">
+        <div class="app-icon" onclick="openApp('Notepad','./img/notepad.png')">
+            <img src="./img/notepad.png">
+            <span>Notepad</span>
         </div>
-
-        <div class="bar">
-            <button class="start"><img src="./img/start.png" width="20"></button>
-            <div class="os-name">WinOS 1.0</div>
-            <div id="the-time">00:00</div>
+        <div class="app-icon" onclick="openApp('Calculator','./img/calculator.png')">
+            <img src="./img/calculator.png">
+            <span>Calculator</span>
+        </div>
+        <div class="app-icon" onclick="openApp('Explorer','./img/files.png')">
+            <img src="./img/files.png">
+            <span>Files</span>
+        </div>
+        <div class="app-icon" onclick="openApp('Browser','./img/chrome.png')">
+            <img src="./img/chrome.png">
+            <span>Browser</span>
+        </div>
+        <div class="app-icon" onclick="openApp('Terminal','./img/terminal.png')">
+            <img src="./img/terminal.png">
+            <span>Terminal</span>
+        </div>
+        <div class="app-icon" onclick="openApp('Settings','./img/settings.png')">
+            <img src="./img/settings.png">
+            <span>Settings</span>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Start Menu -->
+    <div id="startMenu" class="start-menu hidden">
+        <div class="search-bar">
+            <input type="text" placeholder="Search apps...">
+        </div>
+        <div class="pinned-section">
+            <p>Pinned</p>
+            <div class="menu-grid">
+                <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
+                    <img src="./img/settings.png"><span>Settings</span>
+                </div>
+                <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
+                    <img src="./img/notepad.png"><span>Notes</span>
+                </div>
+                <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
+                    <img src="./img/calculator.png"><span>Calc</span>
+                </div>
+                <div class="menu-item" onclick="openApp('Browser','./img/chrome.png')">
+                    <img src="./img/chrome.png"><span>Web</span>
+                </div>
+                <div class="menu-item" onclick="openApp('Terminal','./img/terminal.png')">
+                    <img src="./img/terminal.png"><span>Term</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="tb-left">
+            <span class="brand">WinOS</span>
+        </div>
+        <div class="tb-center">
+            <button class="start-btn" id="startBtn">
+                <img src="./img/start.png" width="22">
+            </button>
+            <div id="taskbar-apps" class="task-icons-container"></div>
+        </div>
+        <div class="tb-right">
+            <div id="clock">00:00</div>
+        </div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
