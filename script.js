@@ -9,11 +9,15 @@ var VFS = {
                     'Anup': {
                         type: 'dir',
                         children: {
-                            'Desktop':  { type: 'dir', children: { 'anupsharma.pdf': { type: 'file', content: 'link' } } },
+                            'Desktop':  { type: 'dir', children: { 'anupsharma12.com.np.lnk': { type: 'file', content: 'link' } } },
                             'Documents': { type: 'dir', children: { 'notes.txt': { type: 'file', content: 'Welcome to WinOS Explorer!\n\nThis is a fully functional virtual file system.\nTry using the Terminal to navigate here and read this file.' } } },
                             'Downloads': { type: 'dir', children: { 'installer.exe': { type: 'file', content: '[binary data]' } } },
                             'Pictures':  { type: 'dir', children: { 'wallpaper.jpg': { type: 'file', content: '[image data]' } } },
-                            'Projects':  { type: 'dir', children: {} }
+                            'Projects':  { type: 'dir', children: {
+                                'TicTacToe.lnk': { type: 'file', content: 'link' },
+                                'Typing.lnk': { type: 'file', content: 'link' },
+                                'Quiz.lnk': { type: 'file', content: 'link' }
+                            } }
                         }
                     }
                 }
@@ -42,6 +46,23 @@ function toUnixPath(p) {
     return p.replace(/\\/g, '/');
 }
 
+function getChildKey(parent, name) {
+    if (!parent || parent.type !== 'dir' || !parent.children) return null;
+    if (parent.children[name]) return name;
+
+    var keys = Object.keys(parent.children);
+    var needle = name.toLowerCase();
+    for (var i = 0; i < keys.length; i++) {
+        if (keys[i].toLowerCase() === needle) return keys[i];
+    }
+    return null;
+}
+
+function getChildNode(parent, name) {
+    var key = getChildKey(parent, name);
+    return key ? parent.children[key] : null;
+}
+
 function getVfsNode(winPath) {
     var parts = toUnixPath(winPath).split('/').filter(function(p) { return p !== ''; });
     if (parts.length === 0) return null;
@@ -49,15 +70,28 @@ function getVfsNode(winPath) {
     if (root === 'C:' && VFS['C:']) {
         var node = VFS['C:'];
         for (var i = 1; i < parts.length; i++) {
-            if (node && node.type === 'dir' && node.children && node.children[parts[i]]) {
-                node = node.children[parts[i]];
-            } else {
-                return null;
-            }
+            node = getChildNode(node, parts[i]);
+            if (!node) return null;
         }
         return node;
     }
     return null;
+}
+
+function normalizeVfsPath(winPath) {
+    var parts = toUnixPath(winPath).split('/').filter(function(p) { return p !== ''; });
+    if (parts.length === 0) return winPath;
+    if (parts[0] !== 'C:' || !VFS['C:']) return winPath;
+
+    var node = VFS['C:'];
+    var out = ['C:'];
+    for (var i = 1; i < parts.length; i++) {
+        var key = getChildKey(node, parts[i]);
+        if (!key) break;
+        out.push(key);
+        node = node.children[key];
+    }
+    return toWinPath(out.join('/'));
 }
 
 function resolvePath(basePath, relativePath) {
@@ -150,6 +184,21 @@ window.vfsState = {
             this.renderExplorer(winId);
         } else if (name.endsWith('.txt')) {
             openFile(name, node.content);
+        } else if (name === 'installer.exe') {
+            runInstaller();
+        } else if (name === 'TicTacToe.lnk') {
+            openApp('TicTacToe', 'img/tictactoe.png');
+        } else if (name === 'Typing.lnk') {
+            openApp('Typing', 'img/typing.png');
+        } else if (name === 'Quiz.lnk') {
+            openApp('Quiz', 'img/quiz.png');
+        } else if (name === 'anupsharma12.com.np' || name === 'anupsharma12.com.np.lnk') {
+            window.open('https://google.com', '_blank');
+        } else if (name.endsWith('.jpg') || name.endsWith('.png')) {
+            var imgSrc = name === 'wallpaper.jpg' ? 'img/wallpaper.jpg' : '';
+            if (imgSrc) {
+                openImageViewer(name, imgSrc);
+            }
         }
     },
 
@@ -188,13 +237,13 @@ function handleTerminalCommand(e, termId) {
         var node = getVfsNode(terminalPath);
 
         if (command === 'help') {
-            result = 'cd, dir, cls, help';
+            result = 'Commands: cd, dir, cls, help';
 
         } else if (command === 'cd') {
             if (args[1]) {
                 var targetPath = resolvePath(terminalPath, args.slice(1).join(' '));
                 if (getVfsNode(targetPath)) {
-                    terminalPath = targetPath;
+                    terminalPath = normalizeVfsPath(targetPath);
                 } else {
                     result = 'Path not found.';
                 }
@@ -308,6 +357,124 @@ function openFile(fileName, content) {
     winElement.onmousedown = function() { topZ++; winElement.style.zIndex = topZ; };
 }
 
+function openImageViewer(fileName, imgSrc) {
+    winCount++;
+    topZ++;
+
+    var winId = 'win-' + winCount;
+    var winElement = document.createElement('div');
+    winElement.className = 'window';
+    winElement.id = winId;
+    winElement.style.zIndex = topZ;
+    winElement.style.left = (140 + winCount * 25) + 'px';
+    winElement.style.top  = (70 + winCount * 25) + 'px';
+
+    winElement.innerHTML =
+        '<div class="title-bar" onmousedown="makeDraggable(event, \'' + winId + '\')">' +
+            '<span style="font-size:12px;">' + fileName + ' - Photo Viewer</span>' +
+            '<div class="win-controls">' +
+                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')">' + '_' + '</button>' +
+                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')">' + '□' + '</button>' +
+                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')">' + '×' + '</button>' +
+            '</div>' +
+        '</div>' +
+        '<div class="content" style="padding:0; display:flex; align-items:center; justify-content:center; background:#111;">' +
+            '<img src="' + imgSrc + '" alt="' + fileName + '" style="max-width:100%; max-height:100%; object-fit:contain;">' +
+        '</div>';
+
+    document.getElementById('desktop').appendChild(winElement);
+    addTaskbarIcon(winId, 'img/files.png');
+    winElement.onmousedown = function() { topZ++; winElement.style.zIndex = topZ; };
+}
+
+function runInstaller() {
+    var overlay = document.createElement('div');
+    overlay.id = 'uac-overlay';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;' +
+        'background:rgba(0,0,0,0.45); z-index:12000; display:flex; align-items:center; justify-content:center;';
+
+    var box = document.createElement('div');
+    box.style.cssText = 'width:420px; background:#f3f3f3; border:1px solid #c8c8c8; border-radius:8px;' +
+        'box-shadow:0 20px 60px rgba(0,0,0,0.35); font-family:Segoe UI,sans-serif; overflow:hidden;';
+
+    box.innerHTML =
+        '<div style="background:#1f4e8c; color:#fff; padding:12px 16px; font-size:14px;">User Account Control</div>' +
+        '<div style="padding:16px; font-size:13px; color:#333;">' +
+            '<div style="font-weight:600; margin-bottom:6px;">Do you want to allow this app to make changes to your device?</div>' +
+            '<div style="margin-bottom:12px;">Program: installer.exe</div>' +
+            '<div style="font-size:12px; color:#666;">Verified publisher: Unknown</div>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; background:#ededed;">' +
+            '<button id="uac-no" style="padding:6px 16px; border:1px solid #bbb; background:#fff; border-radius:4px; cursor:pointer;">No</button>' +
+            '<button id="uac-yes" style="padding:6px 16px; border:1px solid #1f4e8c; background:#1f4e8c; color:#fff; border-radius:4px; cursor:pointer;">Yes</button>' +
+        '</div>';
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    document.getElementById('uac-no').onclick = function() {
+        overlay.remove();
+    };
+
+    document.getElementById('uac-yes').onclick = function() {
+        overlay.remove();
+        spawnInstallerErrors();
+    };
+}
+
+function spawnInstallerErrors() {
+    var count = 10 + Math.floor(Math.random() * 6);
+    var errorsShown = 0;
+
+    function showOneError() {
+        errorsShown++;
+        var popup = document.createElement('div');
+        popup.style.cssText = 'position:fixed; width:320px; background:#fff; border:1px solid #c8c8c8;' +
+            'border-radius:6px; box-shadow:0 12px 30px rgba(0,0,0,0.3); font-family:Segoe UI,sans-serif; z-index:12010;';
+
+        var left = 40 + Math.random() * (window.innerWidth - 380);
+        var top = 40 + Math.random() * (window.innerHeight - 200);
+        popup.style.left = Math.max(10, left) + 'px';
+        popup.style.top = Math.max(10, top) + 'px';
+
+        popup.innerHTML =
+            '<div style="background:#e8e8e8; padding:8px 12px; font-size:12px; border-bottom:1px solid #d0d0d0;">System Error</div>' +
+            '<div style="padding:14px; font-size:13px; color:#333;">The application was unable to start correctly (0xc0000142).</div>' +
+            '<div style="display:flex; justify-content:flex-end; padding:10px 12px; background:#f5f5f5;">' +
+                '<button style="padding:5px 14px; border:1px solid #bbb; background:#fff; border-radius:4px;">OK</button>' +
+            '</div>';
+
+        document.body.appendChild(popup);
+
+        if (errorsShown >= count) {
+            setTimeout(showBlueScreen, 1200);
+        } else {
+            setTimeout(showOneError, 150);
+        }
+    }
+
+    showOneError();
+}
+
+function showBlueScreen() {
+    var bsod = document.createElement('div');
+    bsod.id = 'bsod';
+    bsod.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#1d4ed8;' +
+        'color:#fff; z-index:13000; font-family:Segoe UI,sans-serif; padding:60px; box-sizing:border-box;';
+
+    bsod.innerHTML =
+        '<div style="font-size:18px; margin-bottom:16px;">:(</div>' +
+        '<div style="font-size:28px; font-weight:600; margin-bottom:16px;">Your device ran into a problem and needs to restart.</div>' +
+        '<div style="font-size:16px; margin-bottom:24px;">We\'re just collecting some error info, and then we\'ll restart for you.</div>' +
+        '<div style="font-size:14px;">Stop code: INSTALLER_FAILURE</div>';
+
+    document.body.appendChild(bsod);
+
+    setTimeout(function() {
+        location.reload();
+    }, 3000);
+}
+
 function getAppContent(appName, winId) {
     if (appName === 'Notepad') {
         return '<textarea style="width:100%; height:100%; border:none; outline:none; font-family:Consolas,monospace; font-size:14px; padding:10px; resize:none;" placeholder="Type some notes here..."></textarea>';
@@ -319,6 +486,7 @@ function getAppContent(appName, winId) {
             '<div id="' + termId + '-output" style="overflow-y:auto; flex:1; margin-bottom:10px;">' +
                 '<div style="color:#fff; font-weight:bold;">WinOS Terminal</div>' +
                 '<div>Copyright (C) WinOS. All rights reserved.</div>' +
+                '<div style="color:#9bd59b;">Commands: cd, dir, ls, cls, help</div>' +
                 '<br>' +
             '</div>' +
             '<div style="display:flex; align-items:center;">' +
