@@ -8,82 +8,120 @@
 </head>
 <body>
 
-<!-- Main View -->
-<div class="desktop" id="desktop">
-
-    <!-- Desktop Icons -->
-    <div class="icon-column">
-        <div class="app-icon" onclick="openApp('Notepad','./img/notepad.png')">
-            <img src="./img/notepad.png">
-            <span>Notepad</span>
-        </div>
-        <div class="app-icon" onclick="openApp('Calculator','./img/calculator.png')">
-            <img src="./img/calculator.png">
-            <span>Calculator</span>
-        </div>
-        <div class="app-icon" onclick="openApp('Explorer','./img/files.png')">
-            <img src="./img/files.png">
-            <span>Files</span>
-        </div>
-        <div class="app-icon" onclick="openApp('Browser','./img/chrome.png')">
-            <img src="./img/chrome.png">
-            <span>Browser</span>
-        </div>
-        <div class="app-icon" onclick="openApp('Terminal','./img/terminal.png')">
-            <img src="./img/terminal.png">
-            <span>Terminal</span>
-        </div>
-        <div class="app-icon" onclick="openApp('Settings','./img/settings.png')">
-            <img src="./img/settings.png">
-            <span>Settings</span>
+    <!-- ======================== Lock Screen ======================== -->
+    <!-- Full-screen overlay shown on page load; click to unlock -->
+    <div id="lockScreen" class="lock-screen" onclick="handleLockClick(event)">
+        <div class="lock-bg"></div>
+        <div class="lock-content" id="lockContent">
+            <div class="lock-time" id="lockTime">Clock Broken</div>
+            <div class="lock-date" id="lockDate">Date Broken</div>
+            <div class="lock-hint">Click anywhere or swipe up to unlock</div>
         </div>
     </div>
 
-    <!-- Start Menu -->
-    <div id="startMenu" class="start-menu hidden">
-        <div class="search-bar">
-            <input type="text" placeholder="Search apps...">
+    <!-- ======================== Desktop ======================== -->
+    <div class="desktop" id="desktop">
+
+        <!-- Desktop App Icons (left column, wraps vertically) -->
+        <div class="icon-column">
+            <div class="app-icon" onclick="openApp('Notepad','./img/notepad.png')">
+                <img src="./img/notepad.png" alt="Notepad">
+                <span>Notepad</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Calculator','./img/calculator.png')">
+                <img src="./img/calculator.png" alt="Calculator">
+                <span>Calculator</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Explorer','./img/files.png')">
+                <img src="./img/files.png" alt="Files">
+                <span>Files</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Browser','./img/chrome.png')">
+                <img src="./img/chrome.png" alt="Browser">
+                <span>Not Chrome</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Terminal','./img/terminal.png')">
+                <img src="./img/terminal.png" alt="Terminal">
+                <span>Terminal</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Settings','./img/settings.png')">
+                <img src="./img/settings.png" alt="Settings">
+                <span>Settings</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Spotify','./img/spotify.png')">
+                <img src="./img/spotify.png" alt="Spotify">
+                <span>Spotify</span>
+            </div>
+            <div class="app-icon" onclick="openApp('TicTacToe','./img/tictactoe.png')">
+                <img src="./img/tictactoe.png" alt="Tic Tac Toe">
+                <span>Tic Tac Toe</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Quiz','./img/quiz.png')">
+                <img src="./img/quiz.png" alt="Quiz">
+                <span>Quiz</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Typing','./img/typing.png')">
+                <img src="./img/typing.png" alt="Typing Test">
+                <span>Typing Test</span>
+            </div>
         </div>
-        <div class="pinned-section">
-            <p>Pinned</p>
-            <div class="menu-grid">
-                <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
-                    <img src="./img/settings.png"><span>Settings</span>
-                </div>
-                <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
-                    <img src="./img/notepad.png"><span>Notes</span>
-                </div>
-                <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
-                    <img src="./img/calculator.png"><span>Calc</span>
-                </div>
-                <div class="menu-item" onclick="openApp('Browser','./img/chrome.png')">
-                    <img src="./img/chrome.png"><span>Web</span>
-                </div>
-                <div class="menu-item" onclick="openApp('Terminal','./img/terminal.png')">
-                    <img src="./img/terminal.png"><span>Term</span>
+
+        <!-- Start Menu -->
+        <div id="startMenu" class="start-menu hidden">
+            <div class="search-bar">
+                <input type="text" placeholder="Search apps...">
+            </div>
+            <div class="pinned-section">
+                <p>Pinned</p>
+                <div class="menu-grid">
+                    <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
+                        <img src="./img/settings.png" alt="Settings"><span>Settings</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
+                        <img src="./img/notepad.png" alt="Notes"><span>Notes</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
+                        <img src="./img/calculator.png" alt="Calc"><span>Calculator</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Browser','./img/chrome.png')">
+                        <img src="./img/chrome.png" alt="Web"><span>Not Chrome</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Terminal','./img/terminal.png')">
+                        <img src="./img/terminal.png" alt="Term"><span>Terminal</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Spotify','./img/spotify.png')">
+                        <img src="./img/spotify.png" alt="Spotify"><span>Spotify</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('TicTacToe','./img/tictactoe.png')">
+                        <img src="./img/tictactoe.png" alt="TicTacToe"><span>TicTacToe</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Quiz','./img/quiz.png')">
+                        <img src="./img/quiz.png" alt="Quiz"><span>Quiz</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Typing','./img/typing.png')">
+                        <img src="./img/typing.png" alt="Typing"><span>Typing</span>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="taskbar">
+            <div class="tb-left">
+                <span class="brand">WinOS</span>
+            </div>
+            <div class="tb-center">
+                <button class="start-btn" id="startBtn">
+                    <img src="./img/start.png" width="22" alt="Start">
+                </button>
+                <div id="taskbar-apps" class="task-icons-container"></div>
+            </div>
+            <div class="tb-right">
+                <div id="clock">Clock Broken</div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <div class="tb-left">
-            <span class="brand">WinOS</span>
-        </div>
-        <div class="tb-center">
-            <button class="start-btn" id="startBtn">
-                <img src="./img/start.png" width="22">
-            </button>
-            <div id="taskbar-apps" class="task-icons-container"></div>
-        </div>
-        <div class="tb-right">
-            <div id="clock">00:00</div>
-        </div>
-    </div>
-
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
