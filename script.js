@@ -475,6 +475,63 @@ function showBlueScreen() {
     }, 3000);
 }
 
+var browserState = {};
+
+function browserInit(frameId, inputId) {
+    if (browserState[frameId]) return;
+    var frame = document.getElementById(frameId);
+    if (!frame) return;
+    var startUrl = frame.getAttribute('src') || 'https://en.wikipedia.org';
+    browserState[frameId] = { history: [startUrl], index: 0, inputId: inputId };
+    var input = document.getElementById(inputId);
+    if (input) input.value = startUrl;
+}
+
+function browserNavigate(frameId, inputId, url) {
+    var frame = document.getElementById(frameId);
+    if (!frame) return;
+    browserInit(frameId, inputId);
+
+    var state = browserState[frameId];
+    var nextUrl = url;
+    if (nextUrl.indexOf('http') !== 0) nextUrl = 'https://' + nextUrl;
+
+    state.history = state.history.slice(0, state.index + 1);
+    state.history.push(nextUrl);
+    state.index = state.history.length - 1;
+
+    frame.src = nextUrl;
+    var input = document.getElementById(inputId);
+    if (input) input.value = nextUrl;
+}
+
+function browserReload(frameId) {
+    var state = browserState[frameId];
+    var frame = document.getElementById(frameId);
+    if (!frame || !state) return;
+    frame.src = state.history[state.index];
+}
+
+function browserGoBack(frameId) {
+    var state = browserState[frameId];
+    var frame = document.getElementById(frameId);
+    if (!frame || !state || state.index === 0) return;
+    state.index--;
+    frame.src = state.history[state.index];
+    var input = document.getElementById(state.inputId);
+    if (input) input.value = state.history[state.index];
+}
+
+function browserGoForward(frameId) {
+    var state = browserState[frameId];
+    var frame = document.getElementById(frameId);
+    if (!frame || !state || state.index >= state.history.length - 1) return;
+    state.index++;
+    frame.src = state.history[state.index];
+    var input = document.getElementById(state.inputId);
+    if (input) input.value = state.history[state.index];
+}
+
 function getAppContent(appName, winId) {
     if (appName === 'Notepad') {
         return '<textarea style="width:100%; height:100%; border:none; outline:none; font-family:Consolas,monospace; font-size:14px; padding:10px; resize:none;" placeholder="Type some notes here..."></textarea>';
@@ -533,16 +590,17 @@ function getAppContent(appName, winId) {
 
     if (appName === 'Browser') {
         var frameId = 'browser-frame-' + winId;
+        var inputId = frameId + '-input';
         return '<div style="height:100%; display:flex; flex-direction:column;">' +
             '<div style="display:flex; padding:8px; background:#f1f3f4; border-bottom:1px solid #ccc; align-items:center; gap:10px;">' +
                 '<div style="display:flex; gap:5px;">' +
-                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;">⬅️</button>' +
-                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;">➡️</button>' +
-                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="document.getElementById(\'' + frameId + '\').src = document.getElementById(\'' + frameId + '-input\').value">🔄</button>' +
+                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserGoBack(\'' + frameId + '\')">⬅️</button>' +
+                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserGoForward(\'' + frameId + '\')">➡️</button>' +
+                    '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserReload(\'' + frameId + '\')">🔄</button>' +
                 '</div>' +
-                '<input id="' + frameId + '-input" type="text" value="https://en.wikipedia.org" style="flex:1; padding:6px 12px; border-radius:15px; border:1px solid #ddd; outline:none;" onkeydown="if(event.key===\'Enter\'){ var url=this.value; if(url.indexOf(\'http\')!==0) url=\'https://\'+url; document.getElementById(\'' + frameId + '\').src=url; this.value=url; }">' +
+                '<input id="' + inputId + '" type="text" value="https://en.wikipedia.org" style="flex:1; padding:6px 12px; border-radius:15px; border:1px solid #ddd; outline:none;" onkeydown="if(event.key===\'Enter\'){ browserNavigate(\'' + frameId + '\', \'' + inputId + '\', this.value); }">' +
             '</div>' +
-            '<iframe id="' + frameId + '" src="https://en.wikipedia.org/wiki/Special:Random" style="flex:1; width:100%; border:none;"></iframe>' +
+            '<iframe id="' + frameId + '" src="https://en.wikipedia.org/wiki/Special:Random" style="flex:1; width:100%; border:none;" onload="browserInit(\'' + frameId + '\', \'' + inputId + '\')"></iframe>' +
         '</div>';
     }
 
@@ -630,7 +688,6 @@ function getAppContent(appName, winId) {
         return '<div style="height:100%; display:flex; flex-direction:column; background:#121212;">' +
             '<div class="no-select" style="display:flex; padding:8px 12px; background:#000; border-bottom:1px solid #282828; justify-content:space-between; align-items:center;">' +
                 '<span style="color:#1ed760; font-weight:bold; font-family:sans-serif; font-size:14px;">Spotify Player</span>' +
-                '<input type="text" id="' + winId + '-spot-input" placeholder="Paste Spotify link & press Enter" style="flex:1; max-width:250px; margin-left:15px; padding:4px 10px; border-radius:15px; border:1px solid #333; background:#282828; color:#fff; outline:none; font-size:12px;" onkeydown="handleSpotifyInput(event, \'' + spotFrameId + '\')">' +
             '</div>' +
             '<iframe id="' + spotFrameId + '" data-testid="embed-iframe" style="border-radius:0; flex:1;" src="https://open.spotify.com/embed/playlist/3LKe31Lz04waHxvApGwgok?utm_source=generator" width="100%" height="100%" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>' +
         '</div>';
