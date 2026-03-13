@@ -48,6 +48,10 @@
                 <img src="./img/settings.png" alt="Settings">
                 <span>Settings</span>
             </div>
+            <div class="app-icon" onclick="openApp('Paint','./img/paint.png')">
+                <img src="./img/paint.png" alt="Paint" onerror="this.src='./img/paint.png'">
+                <span>Paint</span>
+            </div>
             <div class="app-icon" onclick="openApp('Spotify','./img/spotify.png')">
                 <img src="./img/spotify.png" alt="Spotify">
                 <span>Spotify</span>
@@ -55,6 +59,10 @@
             <div class="app-icon" onclick="openApp('TicTacToe','./img/tictactoe.png')">
                 <img src="./img/tictactoe.png" alt="Tic Tac Toe">
                 <span>Tic Tac Toe</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Minecraft','./img/minecraft.png')">
+                <img src="./img/minecraft.png" alt="Minecraft">
+                <span>Minecraft</span>
             </div>
             <div class="app-icon" onclick="openApp('Quiz','./img/quiz.png')">
                 <img src="./img/quiz.png" alt="Quiz">
@@ -69,7 +77,7 @@
         <!-- Start Menu -->
         <div id="startMenu" class="start-menu hidden">
             <div class="search-bar">
-                <input type="text" placeholder="Search apps...">
+                <input type="text" placeholder="Search apps...  (Coming Soon)" disabled>
             </div>
             <div class="pinned-section">
                 <p>Pinned</p>
@@ -77,8 +85,14 @@
                     <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
                         <img src="./img/settings.png" alt="Settings"><span>Settings</span>
                     </div>
+                    <div class="menu-item" onclick="openApp('Explorer','./img/files.png')">
+                        <img src="./img/files.png" alt="Files"><span>Files</span>
+                    </div>
                     <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
                         <img src="./img/notepad.png" alt="Notes"><span>Notes</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Paint','./img/paint.png')">
+                        <img src="./img/paint.png" alt="Paint" onerror="this.src='./img/paint.png'"><span>Paint</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
                         <img src="./img/calculator.png" alt="Calc"><span>Calculator</span>
@@ -94,6 +108,9 @@
                     </div>
                     <div class="menu-item" onclick="openApp('TicTacToe','./img/tictactoe.png')">
                         <img src="./img/tictactoe.png" alt="TicTacToe"><span>TicTacToe</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Minecraft','./img/minecraft.png')">
+                        <img src="./img/minecraft.png" alt="Minecraft"><span>Minecraft</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Quiz','./img/quiz.png')">
                         <img src="./img/quiz.png" alt="Quiz"><span>Quiz</span>

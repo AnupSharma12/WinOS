@@ -33,6 +33,12 @@ var currentVfsPath = 'C:\\Users\\Anup';   // Explorer's current directory
 var terminalPath   = 'C:\\Users\\Anup';   // Terminal's working directory
 var winCount = 0;                          // Auto-incrementing window ID counter
 var topZ     = 100;                        // Tracks the highest z-index for window stacking
+var wallpaperChoices = [];
+var activeWallpaper = 'img/wallpaper.jpg';
+
+for (var wallpaperIndex = 1; wallpaperIndex <= 8; wallpaperIndex++) {
+    wallpaperChoices.push('img/wallpapers/' + wallpaperIndex + '.jpg');
+}
 
 
 /* -- Path conversion helpers -- */
@@ -193,7 +199,7 @@ window.vfsState = {
         } else if (name === 'Quiz.lnk') {
             openApp('Quiz', 'img/quiz.png');
         } else if (name === 'anupsharma12.com.np' || name === 'anupsharma12.com.np.lnk') {
-            window.open('https://google.com', '_blank');
+            window.open('https://anupsharma12.com.np', '_blank');
         } else if (name.endsWith('.jpg') || name.endsWith('.png')) {
             var imgSrc = name === 'wallpaper.jpg' ? 'img/wallpaper.jpg' : '';
             if (imgSrc) {
@@ -274,7 +280,7 @@ function handleTerminalCommand(e, termId) {
 
 
 // Apps that fill their content area edge-to-edge (no padding)
-var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing'];
+var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing', 'Settings', 'Paint'];
 
 // Open a new application window on the desktop
 function openApp(appName, iconPath) {
@@ -286,19 +292,41 @@ function openApp(appName, iconPath) {
     winElement.className = 'window';
     winElement.id = winId;
     winElement.style.zIndex = topZ;
-    winElement.style.left = (120 + winCount * 25) + 'px';
-    winElement.style.top  = (50 + winCount * 25) + 'px';
+
+    // Per-app default sizes (mirroring Win11 proportions)
+    var winW = 850, winH = 560;
+    if (appName === 'Calculator')  { winW = 320;  winH = 500; }
+    else if (appName === 'Settings')   { winW = 960;  winH = 640; }
+    else if (appName === 'Paint')      { winW = 900;  winH = 590; }
+    else if (appName === 'Terminal')   { winW = 720;  winH = 480; }
+    else if (appName === 'Notepad')    { winW = 660;  winH = 520; }
+    else if (appName === 'TicTacToe') { winW = 420;  winH = 480; }
+    else if (appName === 'Quiz')       { winW = 640;  winH = 540; }
+    else if (appName === 'Typing')     { winW = 680;  winH = 480; }
+    else if (appName === 'Spotify')    { winW = 400;  winH = 600; }
+
+    winElement.style.width  = winW + 'px';
+    winElement.style.height = winH + 'px';
+
+    // Center on the available desktop area (subtract 40px taskbar)
+    var left = Math.max(20, Math.round((window.innerWidth  - winW) / 2));
+    var top  = Math.max(10, Math.round((window.innerHeight - 40 - winH) / 2));
+    winElement.style.left = left + 'px';
+    winElement.style.top  = top  + 'px';
 
     var content = getAppContent(appName, winId);
     var contentPadding = fullBleedApps.indexOf(appName) > -1 ? 'padding:0;' : '';
 
     winElement.innerHTML =
         '<div class="title-bar" onmousedown="makeDraggable(event, \'' + winId + '\')">' +
-            '<span style="font-size:12px;">' + appName + '</span>' +
+            '<div class="title-bar-left">' +
+                '<img src="' + iconPath + '" onerror="this.style.display=\'none\'">' +
+                '<span>' + appName + '</span>' +
+            '</div>' +
             '<div class="win-controls">' +
-                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')">' + '_' + '</button>' +
-                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')">' + '□' + '</button>' +
-                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')">' + '×' + '</button>' +
+                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')" title="Minimize">&#x2500;</button>' +
+                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')" title="Maximize">&#x2750;</button>' +
+                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')" title="Close">&#x2715;</button>' +
             '</div>' +
         '</div>' +
         '<div class="content" style="' + contentPadding + '">' + content + '</div>';
@@ -322,6 +350,12 @@ function openApp(appName, iconPath) {
     if (appName === 'Typing') {
         setTimeout(function() { typingInit('type-' + winId); }, 50);
     }
+    if (appName === 'Settings') {
+        setTimeout(function() { settingsInit(winId); }, 50);
+    }
+    if (appName === 'Paint') {
+        setTimeout(function() { paintInit(winId); }, 50);
+    }
 }
 
 function openFile(fileName, content) {
@@ -332,19 +366,25 @@ function openFile(fileName, content) {
     winElement.className = 'window';
     winElement.id = winId;
     winElement.style.zIndex = topZ;
-    winElement.style.left = (140 + winCount * 25) + 'px';
-    winElement.style.top  = (70 + winCount * 25) + 'px';
+    var fileW = 660, fileH = 520;
+    winElement.style.width  = fileW + 'px';
+    winElement.style.height = fileH + 'px';
+    winElement.style.left = Math.max(20, Math.round((window.innerWidth  - fileW) / 2)) + 'px';
+    winElement.style.top  = Math.max(10, Math.round((window.innerHeight - 40 - fileH) / 2)) + 'px';
 
     // Escape HTML entities in the file content to prevent rendering
     var safeContent = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     winElement.innerHTML =
         '<div class="title-bar" onmousedown="makeDraggable(event, \'' + winId + '\')">' +
-            '<span style="font-size:12px;">' + fileName + ' - Notepad</span>' +
+            '<div class="title-bar-left">' +
+                '<img src="img/notepad.png" onerror="this.style.display=\'none\'">' +
+                '<span>' + fileName + ' — Notepad</span>' +
+            '</div>' +
             '<div class="win-controls">' +
-                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')">' + '_' + '</button>' +
-                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')">' + '□' + '</button>' +
-                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')">' + '×' + '</button>' +
+                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')" title="Minimize">&#x2500;</button>' +
+                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')" title="Maximize">&#x2750;</button>' +
+                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')" title="Close">&#x2715;</button>' +
             '</div>' +
         '</div>' +
         '<div class="content">' +
@@ -366,16 +406,22 @@ function openImageViewer(fileName, imgSrc) {
     winElement.className = 'window';
     winElement.id = winId;
     winElement.style.zIndex = topZ;
-    winElement.style.left = (140 + winCount * 25) + 'px';
-    winElement.style.top  = (70 + winCount * 25) + 'px';
+    var imgW = 800, imgH = 560;
+    winElement.style.width  = imgW + 'px';
+    winElement.style.height = imgH + 'px';
+    winElement.style.left = Math.max(20, Math.round((window.innerWidth  - imgW) / 2)) + 'px';
+    winElement.style.top  = Math.max(10, Math.round((window.innerHeight - 40 - imgH) / 2)) + 'px';
 
     winElement.innerHTML =
         '<div class="title-bar" onmousedown="makeDraggable(event, \'' + winId + '\')">' +
-            '<span style="font-size:12px;">' + fileName + ' - Photo Viewer</span>' +
+            '<div class="title-bar-left">' +
+                '<img src="img/files.png" onerror="this.style.display=\'none\'">' +
+                '<span>' + fileName + ' \u2014 Photo Viewer</span>' +
+            '</div>' +
             '<div class="win-controls">' +
-                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')">' + '_' + '</button>' +
-                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')">' + '□' + '</button>' +
-                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')">' + '×' + '</button>' +
+                '<button class="win-btn" onclick="minimizeApp(\'' + winId + '\')" title="Minimize">&#x2500;</button>' +
+                '<button class="win-btn" onclick="toggleMaximize(\'' + winId + '\')" title="Maximize">&#x2750;</button>' +
+                '<button class="win-btn close" onclick="closeApp(\'' + winId + '\')" title="Close">&#x2715;</button>' +
             '</div>' +
         '</div>' +
         '<div class="content" style="padding:0; display:flex; align-items:center; justify-content:center; background:#111;">' +
@@ -532,7 +578,342 @@ function browserGoForward(frameId) {
     if (input) input.value = state.history[state.index];
 }
 
+var settingsPages = ['system', 'personalization', 'windowsupdate'];
+
+function applyWallpaper(path) {
+    if (!path) return;
+    activeWallpaper = path;
+
+    document.body.style.backgroundImage = 'url("' + path + '")';
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+
+    var lockBg = document.querySelector('.lock-bg');
+    if (lockBg) {
+        lockBg.style.backgroundImage = 'url("' + path + '")';
+        lockBg.style.backgroundSize = 'cover';
+        lockBg.style.backgroundPosition = 'center';
+    }
+
+    try {
+        localStorage.setItem('winos-wallpaper', path);
+    } catch (err) { }
+
+    settingsRefreshAll();
+}
+
+function loadSavedWallpaper() {
+    try {
+        var savedWallpaper = localStorage.getItem('winos-wallpaper');
+        if (savedWallpaper) activeWallpaper = savedWallpaper;
+    } catch (err) { }
+
+    applyWallpaper(activeWallpaper);
+}
+
+function settingsInit(winId) {
+    settingsRender(winId, 'system');
+}
+
+function settingsRefreshAll() {
+    var shells = document.querySelectorAll('.settings-shell');
+    for (var i = 0; i < shells.length; i++) {
+        var winId = shells[i].getAttribute('data-settings-winid');
+        var page = shells[i].getAttribute('data-page') || 'personalization';
+        if (winId) settingsRender(winId, page);
+    }
+}
+
+function settingsSwitchPage(winId, page) {
+    settingsRender(winId, page);
+}
+
+function settingsRender(winId, page) {
+    var shell = document.getElementById('settings-' + winId);
+    var main = document.getElementById('settings-main-' + winId);
+    if (!shell || !main) return;
+
+    shell.setAttribute('data-page', page);
+
+    var navButtons = shell.querySelectorAll('.settings-nav-btn');
+    for (var i = 0; i < navButtons.length; i++) {
+        var isActive = navButtons[i].getAttribute('data-page') === page;
+        navButtons[i].className = isActive ? 'settings-nav-btn active' : 'settings-nav-btn';
+    }
+
+    var html = '';
+
+    if (page === 'system') {
+        html = '<h2 class="settings-page-title">System</h2>' +
+            '<p class="settings-page-subtitle">Display, sound, storage, and the overall state of your pretend machine.</p>' +
+            '<div class="settings-hero-card">' +
+                '<div>' +
+                    '<h3 class="settings-hero-title">WinOS 11 Home</h3>' +
+                    '<p class="settings-hero-text">This machine is running a fully questionable build of WinOS with desktop apps, floating windows, and just enough chaos to feel real.</p>' +
+                '</div>' +
+                '<div class="settings-mini-stack">' +
+                    '<div class="settings-stat"><div class="settings-stat-label">Processor</div><div class="settings-stat-value">Imaginary i9</div></div>' +
+                    '<div class="settings-stat"><div class="settings-stat-label">Memory</div><div class="settings-stat-value">64 GB vibes</div></div>' +
+                    '<div class="settings-stat"><div class="settings-stat-label">Storage</div><div class="settings-stat-value">Almost infinite</div></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="settings-grid">' +
+                '<div class="settings-card">' +
+                    '<h4>Device specifications</h4>' +
+                    '<div class="settings-row"><strong>Device name</strong><span>ANUP-DESKTOP</span></div>' +
+                    '<div class="settings-row"><strong>Edition</strong><span>WinOS 11 Home</span></div>' +
+                    '<div class="settings-row"><strong>Touch support</strong><span>Optional if your mouse believes</span></div>' +
+                '</div>' +
+                '<div class="settings-card">' +
+                    '<h4>Quick status</h4>' +
+                    '<div class="settings-row"><strong>Windows Update</strong><span class="settings-pill">Up to date</span></div>' +
+                    '<div class="settings-row"><strong>Activation</strong><span>Linked to pure confidence</span></div>' +
+                    '<div class="settings-row"><strong>Battery</strong><span>100% while plugged into imagination</span></div>' +
+                '</div>' +
+            '</div>';
+    }
+
+    if (page === 'personalization') {
+        var wallpaperCards = '';
+        for (var w = 0; w < wallpaperChoices.length; w++) {
+            var path = wallpaperChoices[w];
+            var isSelected = path === activeWallpaper;
+            wallpaperCards += '<div class="settings-wallpaper-card">' +
+                '<img class="settings-wallpaper-preview" src="' + path + '" alt="Wallpaper ' + (w + 1) + '" onerror="this.src=\'./img/wallpaper.jpg\'">' +
+                '<div class="settings-wallpaper-meta">' +
+                    '<strong>Wallpaper ' + (w + 1) + '</strong>' +
+                    '<div class="settings-wallpaper-actions">' +
+                        '<button class="settings-apply-btn" onclick="applyWallpaper(\'' + path + '\')">' + (isSelected ? 'Applied' : 'Apply') + '</button>' +
+                        '<span class="settings-selected-tag">' + (isSelected ? 'Current' : '') + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        html = '<h2 class="settings-page-title">Personalization</h2>' +
+            '<p class="settings-page-subtitle">Background, colors, and the part of Windows everyone changes first.</p>' +
+            '<div class="settings-hero-card">' +
+                '<div>' +
+                    '<h3 class="settings-hero-title">Background</h3>' +
+                    '<p class="settings-hero-text">Choose one of the wallpapers below. WinOS will apply it to the desktop and lock screen immediately.</p>' +
+                '</div>' +
+                '<div class="settings-mini-stack">' +
+                    '<div class="settings-stat"><div class="settings-stat-label">Current wallpaper</div><div class="settings-stat-value">' + (activeWallpaper.indexOf('img/wallpapers/') === 0 ? activeWallpaper.replace('img/wallpapers/', 'Wallpaper ').replace('.jpg', '') : 'Default wallpaper') + '</div></div>' +
+                    '<div class="settings-stat"><div class="settings-stat-label">Source folder</div><div class="settings-stat-value">img/wallpapers</div></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="settings-card" style="margin-bottom:16px;">' +
+                '<h4>Preview</h4>' +
+                '<p>This preview mirrors the wallpaper currently applied to the desktop.</p>' +
+                '<div style="margin-top:14px; border-radius:16px; overflow:hidden; border:1px solid #e6e9f0; background:#dbe4f0;">' +
+                    '<img src="' + activeWallpaper + '" alt="Current wallpaper preview" style="display:block; width:100%; height:220px; object-fit:cover;" onerror="this.src=\'./img/wallpaper.jpg\'">' +
+                '</div>' +
+            '</div>' +
+            '<div class="settings-wallpaper-grid">' + wallpaperCards + '</div>';
+    }
+
+    if (page === 'windowsupdate') {
+        html = '<h2 class="settings-page-title">Windows Update</h2>' +
+            '<p class="settings-page-subtitle">Because even fake operating systems deserve reassuring green checkmarks.</p>' +
+            '<div class="settings-card" style="margin-bottom:16px;">' +
+                '<h4>Status</h4>' +
+                '<div class="settings-row"><strong>Last checked</strong><span>Just now</span></div>' +
+                '<div class="settings-row"><strong>Quality updates</strong><span>No pending updates</span></div>' +
+                '<div class="settings-row"><strong>Feature update</strong><span>WinOS 11 Moment 1 installed</span></div>' +
+            '</div>' +
+            '<div class="settings-grid">' +
+                '<div class="settings-card"><h4>Update history</h4><p>Security Intelligence Update KB500-WINOS installed successfully with zero evidence.</p></div>' +
+                '<div class="settings-card"><h4>Advanced options</h4><p>Optional updates are disabled because the current desktop is already dramatic enough.</p></div>' +
+            '</div>';
+    }
+
+    main.innerHTML = html;
+}
+
+var paintState = {};
+
+function paintInit(winId) {
+    var wrap = document.getElementById('paint-wrap-' + winId);
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    if (!wrap || !canvas) return;
+
+    if (!paintState[winId]) {
+        paintState[winId] = {
+            tool: 'brush',
+            color: '#202020',
+            size: 6,
+            drawing: false,
+            lastX: 0,
+            lastY: 0,
+            booted: false
+        };
+    }
+
+    paintResize(winId);
+    paintUpdateToolbar(winId);
+}
+
+function paintResize(winId) {
+    var state = paintState[winId];
+    var wrap = document.getElementById('paint-wrap-' + winId);
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    if (!state || !wrap || !canvas) return;
+    if (wrap.clientWidth < 20 || wrap.clientHeight < 20) return;
+
+    var snapshot = state.booted ? canvas.toDataURL('image/png') : '';
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+
+    var ctx = canvas.getContext('2d');
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    state.ctx = ctx;
+
+    if (!state.booted) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        state.booted = true;
+        return;
+    }
+
+    var img = new Image();
+    img.onload = function() {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = snapshot;
+}
+
+function paintGetPoint(winId, event) {
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+    };
+}
+
+function paintBegin(winId, event) {
+    var state = paintState[winId];
+    if (!state || !state.ctx) return;
+
+    if (state.tool === 'fill') {
+        paintFill(winId);
+        return;
+    }
+
+    var point = paintGetPoint(winId, event);
+    state.drawing = true;
+    state.lastX = point.x;
+    state.lastY = point.y;
+
+    state.ctx.beginPath();
+    state.ctx.fillStyle = state.tool === 'eraser' ? '#ffffff' : state.color;
+    state.ctx.arc(point.x, point.y, Math.max(1, state.size / 2), 0, Math.PI * 2);
+    state.ctx.fill();
+}
+
+function paintMove(winId, event) {
+    var state = paintState[winId];
+    if (!state || !state.ctx || !state.drawing) return;
+
+    var point = paintGetPoint(winId, event);
+    state.ctx.beginPath();
+    state.ctx.moveTo(state.lastX, state.lastY);
+    state.ctx.lineTo(point.x, point.y);
+    state.ctx.lineWidth = state.size;
+    state.ctx.strokeStyle = state.tool === 'eraser' ? '#ffffff' : state.color;
+    state.ctx.stroke();
+
+    state.lastX = point.x;
+    state.lastY = point.y;
+}
+
+function paintStop(winId) {
+    var state = paintState[winId];
+    if (!state) return;
+    state.drawing = false;
+}
+
+function paintSetTool(winId, tool) {
+    var state = paintState[winId];
+    if (!state) return;
+    state.tool = tool;
+    paintUpdateToolbar(winId);
+}
+
+function paintSetColor(winId, value) {
+    var state = paintState[winId];
+    if (!state) return;
+    state.color = value;
+    paintUpdateToolbar(winId);
+}
+
+function paintSetSize(winId, value) {
+    var state = paintState[winId];
+    if (!state) return;
+    state.size = parseInt(value, 10) || 1;
+    paintUpdateToolbar(winId);
+}
+
+function paintClear(winId) {
+    var state = paintState[winId];
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    if (!state || !state.ctx || !canvas) return;
+    state.ctx.fillStyle = '#ffffff';
+    state.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    paintSetStatus(winId, 'Canvas cleared.');
+}
+
+function paintFill(winId) {
+    var state = paintState[winId];
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    if (!state || !state.ctx || !canvas) return;
+    state.ctx.fillStyle = state.color;
+    state.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    paintSetStatus(winId, 'Canvas filled with ' + state.color + '.');
+}
+
+function paintSave(winId) {
+    var canvas = document.getElementById('paint-canvas-' + winId);
+    if (!canvas) return;
+    var link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = 'winos-paint-' + Date.now() + '.png';
+    link.click();
+    paintSetStatus(winId, 'PNG downloaded.');
+}
+
+function paintUpdateToolbar(winId) {
+    var state = paintState[winId];
+    if (!state) return;
+
+    var brushBtn = document.getElementById('paint-tool-brush-' + winId);
+    var eraserBtn = document.getElementById('paint-tool-eraser-' + winId);
+    var fillBtn = document.getElementById('paint-tool-fill-' + winId);
+    var sizeInput = document.getElementById('paint-size-' + winId);
+    var colorInput = document.getElementById('paint-color-' + winId);
+
+    if (brushBtn) brushBtn.className = state.tool === 'brush' ? 'paint-tool-btn active' : 'paint-tool-btn';
+    if (eraserBtn) eraserBtn.className = state.tool === 'eraser' ? 'paint-tool-btn active' : 'paint-tool-btn';
+    if (fillBtn) fillBtn.className = state.tool === 'fill' ? 'paint-tool-btn active' : 'paint-tool-btn';
+    if (sizeInput) sizeInput.value = state.size;
+    if (colorInput) colorInput.value = state.color;
+
+    paintSetStatus(winId, 'Tool: ' + state.tool + ' • Size: ' + state.size + 'px • Color: ' + state.color);
+}
+
+function paintSetStatus(winId, message) {
+    var status = document.getElementById('paint-status-' + winId);
+    if (status) status.textContent = message;
+}
+
 function getAppContent(appName, winId) {
+    if (appName === 'Minecraft') {
+        return `<iframe src="https://classic.minecraft.net" style="width:100%; height:100%; border:none;"></iframe>`;
+    }
     if (appName === 'Notepad') {
         return '<textarea style="width:100%; height:100%; border:none; outline:none; font-family:Consolas,monospace; font-size:14px; padding:10px; resize:none;" placeholder="Type some notes here..."></textarea>';
     }
@@ -554,12 +935,51 @@ function getAppContent(appName, winId) {
     }
 
     if (appName === 'Settings') {
-        return '<div style="padding:20px; font-family:Segoe UI,sans-serif;">' +
-            '<h3 style="margin-top:0;">System Settings</h3>' +
-            '<p><strong>User:</strong> Anup Sharma</p>' +
-            '<p><strong>OS:</strong> WinOS</p>' +
-            '<p><strong>Version:</strong> 11.0</p>' +
-            '<p><strong>Storage:</strong> Practically infinite</p>' +
+        return '<div id="settings-' + winId + '" class="settings-shell" data-settings-winid="' + winId + '" data-page="system">' +
+            '<div class="settings-sidebar">' +
+                '<div class="settings-profile">' +
+                    '<div class="settings-avatar">A</div>' +
+                    '<div>' +
+                        '<div class="settings-name">Anup Sharma</div>' +
+                        '<div class="settings-mail">anup@winos.local</div>' +
+                    '</div>' +
+                '</div>' +
+                '<button class="settings-nav-btn active" data-page="system" onclick="settingsSwitchPage(\'' + winId + '\', \'system\')">System</button>' +
+                '<button class="settings-nav-btn" data-page="personalization" onclick="settingsSwitchPage(\'' + winId + '\', \'personalization\')">Personalization</button>' +
+                '<button class="settings-nav-btn" data-page="windowsupdate" onclick="settingsSwitchPage(\'' + winId + '\', \'windowsupdate\')">Windows Update</button>' +
+            '</div>' +
+            '<div id="settings-main-' + winId + '" class="settings-main"></div>' +
+        '</div>';
+    }
+
+    if (appName === 'Paint') {
+        return '<div class="paint-shell">' +
+            '<div class="paint-toolbar">' +
+                '<div class="paint-group">' +
+                    '<button id="paint-tool-brush-' + winId + '" class="paint-tool-btn active" onclick="paintSetTool(\'' + winId + '\', \'brush\')">Brush</button>' +
+                    '<button id="paint-tool-eraser-' + winId + '" class="paint-tool-btn" onclick="paintSetTool(\'' + winId + '\', \'eraser\')">Eraser</button>' +
+                    '<button id="paint-tool-fill-' + winId + '" class="paint-tool-btn" onclick="paintSetTool(\'' + winId + '\', \'fill\')">Fill</button>' +
+                '</div>' +
+                '<div class="paint-group">' +
+                    '<label style="font-size:12px; color:#475467;">Size</label>' +
+                    '<input id="paint-size-' + winId + '" class="paint-size" type="range" min="1" max="32" value="6" oninput="paintSetSize(\'' + winId + '\', this.value)">' +
+                '</div>' +
+                '<div class="paint-group">' +
+                    '<label style="font-size:12px; color:#475467;">Color</label>' +
+                    '<input id="paint-color-' + winId + '" class="paint-color" type="color" value="#202020" oninput="paintSetColor(\'' + winId + '\', this.value)">' +
+                '</div>' +
+                '<div class="paint-group">' +
+                    '<button class="paint-action-btn" onclick="paintFill(\'' + winId + '\')">Fill canvas</button>' +
+                    '<button class="paint-action-btn" onclick="paintClear(\'' + winId + '\')">Clear</button>' +
+                    '<button class="paint-action-btn" onclick="paintSave(\'' + winId + '\')">Save PNG</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="paint-stage">' +
+                '<div id="paint-wrap-' + winId + '" class="paint-canvas-wrap">' +
+                    '<canvas id="paint-canvas-' + winId + '" class="paint-canvas" onmousedown="paintBegin(\'' + winId + '\', event)" onmousemove="paintMove(\'' + winId + '\', event)" onmouseup="paintStop(\'' + winId + '\')" onmouseleave="paintStop(\'' + winId + '\')"></canvas>' +
+                '</div>' +
+            '</div>' +
+            '<div id="paint-status-' + winId + '" class="paint-status">Tool: brush • Size: 6px • Color: #202020</div>' +
         '</div>';
     }
 
@@ -1311,10 +1731,12 @@ function toggleMaximize(winId) {
         // Restore to previous position/size
         win.style.left   = win.dataset.prevLeft   || '120px';
         win.style.top    = win.dataset.prevTop     || '50px';
-        win.style.width  = win.dataset.prevWidth   || '550px';
-        win.style.height = win.dataset.prevHeight  || '400px';
+        win.style.width  = win.dataset.prevWidth   || '850px';
+        win.style.height = win.dataset.prevHeight  || '560px';
         win.dataset.maximized = 'false';
     }
+
+    setTimeout(function() { paintResize(winId); }, 40);
 }
 
 // Remove the window and its taskbar icon from the DOM
@@ -1352,6 +1774,8 @@ function makeDraggable(e, winId) {
 }
 
 // ========== System UI ==========
+
+loadSavedWallpaper();
 
 // Update the lock screen's time and date display
 function updateLockClock() {

@@ -146,57 +146,89 @@ body {
 
 .window {
     position: absolute;
-    width: 550px;
-    height: 400px;
-    background: rgba(255, 255, 255, 0.98);
+    width: 850px;
+    height: 560px;
+    background: rgba(253, 253, 253, 0.98);
     backdrop-filter: blur(10px);
-    border: 1px solid #999;
-    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 28px 56px rgba(0, 0, 0, 0.32), 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 /* Title bar — draggable header with app name + window controls */
 .title-bar {
-    height: 35px;
-    background: #fff;
+    height: 32px;
+    min-height: 32px;
+    background: #f3f3f3;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 0 0 12px;
     cursor: move;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 10px 10px 0 0;
     user-select: none;
+}
+
+.title-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.title-bar-left img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.title-bar-left span {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #1c1c1c;
 }
 
 /* Minimize / maximize / close button group */
 .win-controls {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;
+    height: 100%;
+    flex-shrink: 0;
 }
 
 .win-btn {
-    width: 22px;
-    height: 22px;
+    width: 46px;
+    height: 32px;
     border: none;
     background: transparent;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
+    color: #1c1c1c;
+    transition: background 0.1s ease;
 }
 
 .win-btn:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.win-btn.close {
+    border-radius: 0 10px 0 0;
 }
 
 .win-btn.close:hover {
-    background: #e81123;
-    color: white;
+    background: #c42b1c;
+    color: #fff;
 }
 
 /* Main content area inside a window */
@@ -368,7 +400,393 @@ body {
 
 
 /* --------------------------------------------------------------------------
-   7. Tic Tac Toe
+   7. Settings + Paint
+   -------------------------------------------------------------------------- */
+
+.settings-shell {
+    height: 100%;
+    display: flex;
+    background: #f5f7fb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1c1c1c;
+}
+
+.settings-sidebar {
+    width: 220px;
+    background: rgba(248, 249, 252, 0.94);
+    border-right: 1px solid #e5e8ef;
+    padding: 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.settings-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f6feb, #58a6ff);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.settings-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.settings-mail {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.settings-nav-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: #2d3748;
+    transition: background 0.15s ease;
+}
+
+.settings-nav-btn:hover {
+    background: rgba(31, 111, 235, 0.08);
+}
+
+.settings-nav-btn.active {
+    background: #e8f1ff;
+    color: #0f4db8;
+    font-weight: 600;
+}
+
+.settings-main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.settings-page-title {
+    margin: 0 0 6px;
+    font-size: 27px;
+    font-weight: 600;
+}
+
+.settings-page-subtitle {
+    margin: 0 0 22px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.settings-hero-card,
+.settings-card,
+.settings-wallpaper-card {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #e6e9f0;
+    border-radius: 18px;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
+}
+
+.settings-hero-card {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.settings-hero-title {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.settings-hero-text {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.settings-mini-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-stat {
+    padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #f9fbff, #eef3fd);
+    border: 1px solid #dbe5f4;
+}
+
+.settings-stat-label {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.settings-stat-value {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.settings-card {
+    padding: 16px;
+}
+
+.settings-card h4,
+.settings-wallpaper-card h4 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.settings-card p,
+.settings-wallpaper-card p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid #edf0f6;
+}
+
+.settings-row:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
+
+.settings-row strong {
+    font-size: 13px;
+}
+
+.settings-row span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.settings-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #0f4db8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.settings-wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.settings-wallpaper-card {
+    overflow: hidden;
+}
+
+.settings-wallpaper-preview {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: #dbe4f0;
+    display: block;
+}
+
+.settings-wallpaper-meta {
+    padding: 10px;
+}
+
+.settings-wallpaper-meta strong {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.settings-wallpaper-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-apply-btn {
+    border: none;
+    background: #0f6cbd;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.settings-apply-btn:hover {
+    background: #115ea3;
+}
+
+.settings-selected-tag {
+    color: #0f6cbd;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.paint-shell {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #f3f3f3;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.paint-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, #fdfdfd, #eceff3);
+    border-bottom: 1px solid #d9dce2;
+}
+
+.paint-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 10px;
+    border-right: 1px solid #d8dde6;
+}
+
+.paint-group:last-child {
+    border-right: none;
+    padding-right: 0;
+}
+
+.paint-tool-btn,
+.paint-action-btn {
+    border: 1px solid #cdd5df;
+    background: #fff;
+    color: #1f2937;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.paint-tool-btn:hover,
+.paint-action-btn:hover {
+    background: #f8fbff;
+}
+
+.paint-tool-btn.active {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    color: #0f4db8;
+    font-weight: 600;
+}
+
+.paint-size {
+    width: 110px;
+}
+
+.paint-color {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid #cdd5df;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.paint-stage {
+    flex: 1;
+    padding: 14px;
+    background: linear-gradient(180deg, #dde6f1, #edf2f7);
+}
+
+.paint-canvas-wrap {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    border: 1px solid #cfd8e3;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 10px 24px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.paint-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.paint-status {
+    padding: 8px 14px;
+    border-top: 1px solid #d9dce2;
+    background: #fafafa;
+    font-size: 12px;
+    color: #667085;
+}
+
+@media (max-width: 900px) {
+    .settings-hero-card,
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-sidebar {
+        width: 190px;
+    }
+
+    .settings-wallpaper-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* --------------------------------------------------------------------------
+   8. Tic Tac Toe
    -------------------------------------------------------------------------- */
 
 .ttt-row {
@@ -451,7 +869,7 @@ body {
 
 
 /* --------------------------------------------------------------------------
-   8. Utility Classes
+    9. Utility Classes
    -------------------------------------------------------------------------- */
 
 .hidden {
@@ -464,7 +882,7 @@ body {
 
 
 /* --------------------------------------------------------------------------
-   9. Keyframe Animations
+    10. Keyframe Animations
    -------------------------------------------------------------------------- */
 
 /* Blinking cursor for terminal-like elements */
