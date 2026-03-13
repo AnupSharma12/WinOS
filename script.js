@@ -29,12 +29,14 @@ var VFS = {
 
 
 /* -- VFS global state -- */
-var currentVfsPath = 'C:\\Users\\Anup';   // Explorer's current directory
-var terminalPath   = 'C:\\Users\\Anup';   // Terminal's working directory
-var winCount = 0;                          // Auto-incrementing window ID counter
-var topZ     = 100;                        // Tracks the highest z-index for window stacking
+var currentVfsPath = 'C:\\Users\\Anup';
+var terminalPath   = 'C:\\Users\\Anup';
+var winCount = 0;
+var topZ     = 100;
 var wallpaperChoices = [];
-var activeWallpaper = 'img/wallpaper.jpg';
+
+// Set your new default wallpaper here
+var activeWallpaper = 'img/wallpapers/1.jpg'; 
 
 for (var wallpaperIndex = 1; wallpaperIndex <= 8; wallpaperIndex++) {
     wallpaperChoices.push('img/wallpapers/' + wallpaperIndex + '.jpg');
