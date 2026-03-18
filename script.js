@@ -11,7 +11,7 @@ var VFS = {
                         children: {
                             'Desktop':  { type: 'dir', children: { 'anupsharma12.com.np.lnk': { type: 'file', content: 'link' } } },
                             'Documents': { type: 'dir', children: { 'notes.txt': { type: 'file', content: 'Welcome to WinOS Explorer!\n\nThis is a fully functional virtual file system.\nTry using the Terminal to navigate here and read this file.' } } },
-                            'Downloads': { type: 'dir', children: { 'installer.exe': { type: 'file', content: '[binary data]' } } },
+                            'Downloads': { type: 'dir', children: { 'installer.exe': { type: 'file', content: '[binary data]' }, 'Cheats++.exe': { type: 'file', content: '[binary data]' } } },
                             'Pictures':  { type: 'dir', children: { 'wallpaper.jpg': { type: 'file', content: '[image data]' } } },
                             'Projects':  { type: 'dir', children: {
                                 'TicTacToe.lnk': { type: 'file', content: 'link' },
@@ -193,7 +193,9 @@ window.vfsState = {
         } else if (name.endsWith('.txt')) {
             openFile(name, node.content);
         } else if (name === 'installer.exe') {
-            runInstaller();
+            runInstaller('installer.exe');
+        } else if (name === 'Cheats++.exe' || name === 'Cheats++.lnk') {
+            runInstaller('Cheats++.exe');
         } else if (name === 'TicTacToe.lnk') {
             openApp('TicTacToe', 'img/tictactoe.png');
         } else if (name === 'Typing.lnk') {
@@ -286,6 +288,10 @@ var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator',
 
 // Open a new application window on the desktop
 function openApp(appName, iconPath) {
+    if (appName === 'Cheats++') {
+        runInstaller('Cheats++.exe');
+        return;
+    }
     winCount++;
     topZ++;
 
@@ -435,7 +441,8 @@ function openImageViewer(fileName, imgSrc) {
     winElement.onmousedown = function() { topZ++; winElement.style.zIndex = topZ; };
 }
 
-function runInstaller() {
+function runInstaller(programName) {
+    programName = programName || 'installer.exe';
     var overlay = document.createElement('div');
     overlay.id = 'uac-overlay';
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;' +
@@ -449,7 +456,7 @@ function runInstaller() {
         '<div style="background:#1f4e8c; color:#fff; padding:12px 16px; font-size:14px;">User Account Control</div>' +
         '<div style="padding:16px; font-size:13px; color:#333;">' +
             '<div style="font-weight:600; margin-bottom:6px;">Do you want to allow this app to make changes to your device?</div>' +
-            '<div style="margin-bottom:12px;">Program: installer.exe</div>' +
+            '<div style="margin-bottom:12px;">Program: ' + programName + '</div>' +
             '<div style="font-size:12px; color:#666;">Verified publisher: Unknown</div>' +
         '</div>' +
         '<div style="display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; background:#ededed;">' +
