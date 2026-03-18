@@ -406,20 +406,39 @@ body {
 .settings-shell {
     height: 100%;
     display: flex;
-    background: #f5f7fb;
+    background: rgba(238, 241, 245, 0.85);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #1c1c1c;
 }
 
 .settings-sidebar {
-    width: 240px;
-    background: rgba(243, 243, 243, 0.99);
-    border-right: 1px solid #d0d0d0;
-    padding: 12px 8px;
+    width: 280px;
+    background: transparent;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px 10px;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 4px;
     overflow-y: auto;
+}
+
+.settings-search-container {
+    padding: 0 12px 16px;
+}
+
+.settings-search-bar {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    font-size: 13px;
+    outline: none;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    position: relative;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="%23605e5c"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
 }
 
 .settings-profile {
@@ -476,17 +495,30 @@ body {
     transition: background 0.1s ease;
     display: flex;
     align-items: center;
-    gap: 11px;
+    gap: 12px;
+    position: relative;
 }
 
 .settings-nav-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .settings-nav-btn.active {
-    background: rgba(0, 120, 212, 0.1);
-    color: #0078d4;
+    background: rgba(0, 0, 0, 0.06);
+    color: #1c1c1c;
     font-weight: 500;
+}
+
+.settings-nav-btn.active::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    background: #0078d4;
+    border-radius: 4px;
 }
 
 .settings-nav-icon {
@@ -523,9 +555,9 @@ body {
 .settings-card,
 .settings-wallpaper-card {
     background: rgba(255, 255, 255, 1);
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .settings-hero-card {
@@ -608,13 +640,32 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 11px 0;
-    border-top: 1px solid #f0f0f0;
+    padding: 12px 14px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: transparent;
+    transition: background 0.1s;
+    border-radius: 4px;
+    margin: 2px 0;
+    cursor: pointer;
+}
+
+.settings-row:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.settings-row-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.settings-row-icon {
+    color: #605e5c;
 }
 
 .settings-row:first-of-type {
     border-top: none;
-    padding-top: 0;
+    padding-top: 12px;
 }
 
 .settings-row strong {
@@ -895,6 +946,169 @@ body {
 
 .ttt-btn:hover {
     background: #e67e22;
+}
+
+
+/* --------------------------------------------------------------------------
+   8. Explorer (Files) App
+   -------------------------------------------------------------------------- */
+.explorer-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: rgba(238, 241, 245, 0.85); /* Mica effect */
+    color: #1c1c1c;
+}
+
+.explorer-toolbar {
+    display: flex;
+    padding: 8px 12px;
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    gap: 8px;
+    align-items: center;
+}
+
+.explorer-tool-btn {
+    border: none;
+    background: transparent;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #1c1c1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+}
+
+.explorer-tool-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.explorer-tool-btn span {
+    font-size: 18px;
+}
+
+.explorer-address-bar {
+    flex: 1;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    padding: 4px 10px;
+    display: flex;
+    background: #ffffff;
+    align-items: center;
+    gap: 8px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.explorer-address-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 13px;
+    background: transparent;
+    color: #1c1c1c;
+}
+
+.explorer-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.explorer-sidebar {
+    width: 200px;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px 8px;
+    background: transparent;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.explorer-sidebar-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.1s;
+    position: relative;
+}
+
+.explorer-sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.explorer-sidebar-item.active {
+    background: rgba(0, 0, 0, 0.06);
+    font-weight: 500;
+}
+
+.explorer-sidebar-item.active::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 14px;
+    background: #0078d4;
+    border-radius: 4px;
+}
+
+.explorer-sidebar-icon {
+    font-size: 18px;
+    color: #0078d4;
+    font-variation-settings: 'FILL' 1;
+}
+
+.explorer-main {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    gap: 8px;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    background: #ffffff;
+    overflow-y: auto;
+}
+
+.explorer-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    width: 80px;
+    height: 85px;
+    text-align: center;
+    transition: background 0.1s;
+}
+
+.explorer-item:hover {
+    background: rgba(0, 120, 212, 0.08); /* Windows light blue highlight */
+}
+
+.explorer-item-name {
+    font-size: 11px;
+    margin-top: 6px;
+    word-break: break-all;
+    color: #1c1c1c;
+}
+
+.explorer-statusbar {
+    padding: 4px 12px;
+    background: transparent;
+    font-size: 11px;
+    color: #605e5c;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 
