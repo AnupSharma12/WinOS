@@ -17,7 +17,8 @@ var VFS = {
                                 type: 'dir', children: {
                                     'TicTacToe.lnk': { type: 'file', content: 'link' },
                                     'Typing.lnk': { type: 'file', content: 'link' },
-                                    'Quiz.lnk': { type: 'file', content: 'link' }
+                                    'Quiz.lnk': { type: 'file', content: 'link' },
+                                    'Snake.lnk': { type: 'file', content: 'link' }
                                 }
                             }
                         }
@@ -208,6 +209,8 @@ window.vfsState = {
             openApp('Typing', 'img/typing.png');
         } else if (name === 'Quiz.lnk') {
             openApp('Quiz', 'img/quiz.png');
+        } else if (name === 'Snake.lnk') {
+            openApp('Snake', 'img/snake.png');
         } else if (name === 'anupsharma12.com.np' || name === 'anupsharma12.com.np.lnk') {
             window.open('https://anupsharma12.com.np', '_blank');
         } else if (name.endsWith('.jpg') || name.endsWith('.png')) {
@@ -290,7 +293,7 @@ function handleTerminalCommand(e, termId) {
 
 
 // Apps that fill their content area edge-to-edge (no padding)
-var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing', 'Settings', 'Paint', 'VS Code'];
+var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing', 'Settings', 'Paint', 'VS Code', 'Snake'];
 
 // Open a new application window on the desktop
 function openApp(appName, iconPath) {
@@ -319,6 +322,7 @@ function openApp(appName, iconPath) {
     else if (appName === 'Typing') { winW = 680; winH = 480; }
     else if (appName === 'Spotify') { winW = 400; winH = 600; }
     else if (appName === 'VS Code') { winW = 900; winH = 600; }
+    else if (appName === 'Snake') { winW = 440; winH = 520; }
 
     winElement.style.width = winW + 'px';
     winElement.style.height = winH + 'px';
@@ -370,6 +374,9 @@ function openApp(appName, iconPath) {
     }
     if (appName === 'Paint') {
         setTimeout(function () { paintInit(winId); }, 50);
+    }
+    if (appName === 'Snake') {
+        setTimeout(function () { snakeInit('snake-' + winId); }, 50);
     }
 }
 
@@ -927,6 +934,24 @@ function paintSetStatus(winId, message) {
 }
 
 function getAppContent(appName, winId) {
+    if (appName === 'Snake') {
+        var sid = 'snake-' + winId;
+        return '<div id="' + sid + '" style="height:100%; display:flex; flex-direction:column; background:#1a1a2e; font-family:Segoe UI,sans-serif; position:relative; outline:none;" tabindex="0">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#16213e;">' +
+            '<span style="font-size:1.3em; font-weight:bold; color:#0f3460;">🐍 <span style="color:#e94560;">Snake</span></span>' +
+            '<span id="' + sid + '-score" style="font-size:1em; color:#eee;">Score: 0</span>' +
+            '</div>' +
+            '<div style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px;">' +
+            '<canvas id="' + sid + '-canvas" style="background:#0f3460; border-radius:8px;"></canvas>' +
+            '</div>' +
+            '<div id="' + sid + '-overlay" style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(26,26,46,0.92); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; z-index:2;">' +
+            '<h2 id="' + sid + '-endtitle" style="color:#e94560; font-size:1.8em; margin:10px;"></h2>' +
+            '<p id="' + sid + '-endscore" style="color:#eee; font-size:1.1em; margin:10px;"></p>' +
+            '<button style="margin-top:10px; padding:8px 28px; background:#e94560; color:#fff; border:none; border-radius:6px; font-size:14px; cursor:pointer;" onclick="snakeRestart(\'' + sid + '\')">&#8634; Play Again</button>' +
+            '</div>' +
+            '</div>';
+    }
+
     if (appName === 'Minecraft') {
         return `<iframe src="https://classic.minecraft.net" style="width:100%; height:100%; border:none;"></iframe>`;
     }
@@ -1065,6 +1090,13 @@ function getAppContent(appName, winId) {
             '</div>' +
             // Mark selection screen (X or O)
             '<div id="' + gid + '-config" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">' +
+            '<h2 style="color:#fff; font-size:1.2em; margin-bottom:10px;">Difficulty</h2>' +
+            '<select id="' + gid + '-diff" style="margin-bottom:20px; padding:6px 12px; font-size:1em; border-radius:4px; border:none; outline:none; cursor:pointer; background:#fff; color:#333;">' +
+            '<option value="easy">Easy</option>' +
+            '<option value="medium">Medium</option>' +
+            '<option value="hard">Hard</option>' +
+            '<option value="impossible" selected>Impossible</option>' +
+            '</select>' +
             '<h2 style="color:#fff; font-size:1.5em; margin-bottom:20px;">Choose your mark</h2>' +
             '<div style="display:flex; gap:10px;">' +
             '<div class="ttt-cell ttt-pick" onclick="tttPickMark(\'' + gid + '\', \'X\')">X</div>' +
@@ -1183,10 +1215,13 @@ var tttThreats = [
 ];
 
 function tttPickMark(gid, mark) {
+    var diffSelect = document.getElementById(gid + '-diff');
+    var difficulty = diffSelect ? diffSelect.value : 'impossible';
     var g = {
         board: [[null, null, null], [null, null, null], [null, null, null]],
         playerMark: mark,
         aiMark: mark === 'X' ? 'O' : 'X',
+        difficulty: difficulty,
         turnsPlayed: 0,
         playerTurn: true,
         nextMove: [null, null],
@@ -1241,7 +1276,26 @@ function tttAiPlay(gid) {
     setTimeout(function () {
         var g = tttGames[gid];
         if (!g || g.gameOver) return;
-        tttMinimax(g, 0);
+
+        var diff = g.difficulty || 'impossible';
+        var moves = tttAvailableMoves(g);
+        var useRandom = false;
+
+        if (diff === 'easy') {
+            useRandom = true;
+        } else if (diff === 'medium') {
+            useRandom = Math.random() < 0.5;
+        } else if (diff === 'hard') {
+            useRandom = Math.random() < 0.2;
+        }
+
+        if (useRandom && moves.length > 0) {
+            var r = Math.floor(Math.random() * moves.length);
+            g.nextMove = moves[r];
+        } else {
+            tttMinimax(g, 0);
+        }
+
         tttMakePlay(gid, g.aiMark, g.nextMove[0], g.nextMove[1]);
         tttCheckPlay(gid, g.aiMark);
 
@@ -1765,6 +1819,155 @@ function closeApp(winId) {
     var taskIcon = document.getElementById('task-' + winId);
     if (win) win.remove();
     if (taskIcon) taskIcon.remove();
+}
+
+// ========== Snake Game ==========
+var snakeGames = {};
+
+function snakeInit(sid) {
+    var wrapper = document.getElementById(sid);
+    var canvas = document.getElementById(sid + '-canvas');
+    if (!wrapper || !canvas) return;
+
+    var grid = 16;
+    var cols = 25;
+    var rows = 25;
+    canvas.width = cols * grid;
+    canvas.height = rows * grid;
+
+    var g = {
+        ctx: canvas.getContext('2d'),
+        grid: grid,
+        cols: cols,
+        rows: rows,
+        snake: { x: 10 * grid, y: 10 * grid, dx: grid, dy: 0, cells: [], maxCells: 4 },
+        apple: { x: 0, y: 0 },
+        score: 0,
+        count: 0,
+        running: true,
+        raf: null
+    };
+
+    // Place apple randomly
+    g.apple.x = Math.floor(Math.random() * cols) * grid;
+    g.apple.y = Math.floor(Math.random() * rows) * grid;
+
+    snakeGames[sid] = g;
+
+    // Hide game-over overlay
+    var overlay = document.getElementById(sid + '-overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    // Update score display
+    var scoreEl = document.getElementById(sid + '-score');
+    if (scoreEl) scoreEl.textContent = 'Score: 0';
+
+    // Keyboard handler scoped to this game instance
+    if (!g._keyHandler) {
+        g._keyHandler = function (e) {
+            var game = snakeGames[sid];
+            if (!game || !game.running) return;
+            var s = game.snake;
+            if (e.which === 37 && s.dx === 0) { s.dx = -game.grid; s.dy = 0; e.preventDefault(); }
+            else if (e.which === 38 && s.dy === 0) { s.dy = -game.grid; s.dx = 0; e.preventDefault(); }
+            else if (e.which === 39 && s.dx === 0) { s.dx = game.grid; s.dy = 0; e.preventDefault(); }
+            else if (e.which === 40 && s.dy === 0) { s.dy = game.grid; s.dx = 0; e.preventDefault(); }
+        };
+        wrapper.addEventListener('keydown', g._keyHandler);
+    }
+
+    // Focus the wrapper so keys work
+    wrapper.focus();
+
+    // Start game loop
+    function loop() {
+        var game = snakeGames[sid];
+        if (!game || !game.running) return;
+        game.raf = requestAnimationFrame(loop);
+
+        // Slow to ~10 fps
+        if (++game.count < 6) return;
+        game.count = 0;
+
+        var ctx = game.ctx;
+        var s = game.snake;
+        var grd = game.grid;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Move snake
+        s.x += s.dx;
+        s.y += s.dy;
+
+        // Wrap edges
+        if (s.x < 0) s.x = canvas.width - grd;
+        else if (s.x >= canvas.width) s.x = 0;
+        if (s.y < 0) s.y = canvas.height - grd;
+        else if (s.y >= canvas.height) s.y = 0;
+
+        s.cells.unshift({ x: s.x, y: s.y });
+        if (s.cells.length > s.maxCells) s.cells.pop();
+
+        // Draw apple with glow
+        ctx.shadowColor = '#e94560';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#e94560';
+        ctx.beginPath();
+        ctx.arc(game.apple.x + grd / 2, game.apple.y + grd / 2, grd / 2 - 1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw snake
+        for (var i = 0; i < s.cells.length; i++) {
+            var cell = s.cells[i];
+
+            // Gradient green for body, brighter head
+            var g1 = i === 0 ? '#53d769' : '#2ecc71';
+            ctx.fillStyle = g1;
+            ctx.fillRect(cell.x, cell.y, grd - 1, grd - 1);
+
+            // Ate apple
+            if (cell.x === game.apple.x && cell.y === game.apple.y) {
+                s.maxCells++;
+                game.score += 10;
+                var scoreEl = document.getElementById(sid + '-score');
+                if (scoreEl) scoreEl.textContent = 'Score: ' + game.score;
+                game.apple.x = Math.floor(Math.random() * game.cols) * grd;
+                game.apple.y = Math.floor(Math.random() * game.rows) * grd;
+            }
+
+            // Self-collision
+            for (var j = i + 1; j < s.cells.length; j++) {
+                if (cell.x === s.cells[j].x && cell.y === s.cells[j].y) {
+                    snakeGameOver(sid);
+                    return;
+                }
+            }
+        }
+    }
+
+    g.raf = requestAnimationFrame(loop);
+}
+
+function snakeGameOver(sid) {
+    var g = snakeGames[sid];
+    if (!g) return;
+    g.running = false;
+    if (g.raf) cancelAnimationFrame(g.raf);
+
+    var overlay = document.getElementById(sid + '-overlay');
+    var title = document.getElementById(sid + '-endtitle');
+    var score = document.getElementById(sid + '-endscore');
+
+    if (title) title.textContent = 'Game Over!';
+    if (score) score.textContent = 'Final Score: ' + g.score;
+    if (overlay) overlay.style.display = 'flex';
+}
+
+function snakeRestart(sid) {
+    var g = snakeGames[sid];
+    if (g && g.raf) cancelAnimationFrame(g.raf);
+    snakeInit(sid);
 }
 
 // ========== Draggable Windows ==========
