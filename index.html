@@ -31,66 +31,78 @@
         <!-- Desktop App Icons (left column, wraps vertically) -->
         <div class="icon-column">
             <div class="app-icon" onclick="openApp('Notepad','./img/notepad.png')">
-                <img src="./img/notepad.png" alt="Notepad">
+                <img src="./img/notepad.png" alt="Notepad" onerror="this.src='./img/unknown.png'">
                 <span>Notepad</span>
             </div>
             <div class="app-icon" onclick="openApp('Calculator','./img/calculator.png')">
-                <img src="./img/calculator.png" alt="Calculator">
+                <img src="./img/calculator.png" alt="Calculator" onerror="this.src='./img/unknown.png'">
                 <span>Calculator</span>
             </div>
             <div class="app-icon" onclick="openApp('Explorer','./img/files.png')">
-                <img src="./img/files.png" alt="Files">
+                <img src="./img/files.png" alt="Files" onerror="this.src='./img/unknown.png'">
                 <span>Files</span>
             </div>
             <div class="app-icon" onclick="openApp('Browser','./img/chrome.png')">
-                <img src="./img/chrome.png" alt="Browser">
+                <img src="./img/chrome.png" alt="Browser" onerror="this.src='./img/unknown.png'">
                 <span>Not Chrome</span>
             </div>
             <div class="app-icon" onclick="openApp('Terminal','./img/terminal.png')">
-                <img src="./img/terminal.png" alt="Terminal">
+                <img src="./img/terminal.png" alt="Terminal" onerror="this.src='./img/unknown.png'">
                 <span>Terminal</span>
             </div>
             <div class="app-icon" onclick="openApp('Settings','./img/settings.png')">
-                <img src="./img/settings.png" alt="Settings">
+                <img src="./img/settings.png" alt="Settings" onerror="this.src='./img/unknown.png'">
                 <span>Settings</span>
             </div>
             <div class="app-icon" onclick="openApp('Paint','./img/paint.png')">
-                <img src="./img/paint.png" alt="Paint">
+                <img src="./img/paint.png" alt="Paint" onerror="this.src='./img/unknown.png'">
                 <span>Paint</span>
             </div>
             <div class="app-icon" onclick="openApp('Spotify','./img/spotify.png')">
-                <img src="./img/spotify.png" alt="Spotify">
+                <img src="./img/spotify.png" alt="Spotify" onerror="this.src='./img/unknown.png'">
                 <span>Spotify</span>
             </div>
             <div class="app-icon" onclick="openApp('TicTacToe','./img/tictactoe.png')">
-                <img src="./img/tictactoe.png" alt="Tic Tac Toe">
+                <img src="./img/tictactoe.png" alt="Tic Tac Toe" onerror="this.src='./img/unknown.png'">
                 <span>Tic Tac Toe</span>
             </div>
             <div class="app-icon" onclick="openApp('Minecraft','./img/minecraft.png')">
-                <img src="./img/minecraft.png" alt="Minecraft">
+                <img src="./img/minecraft.png" alt="Minecraft" onerror="this.src='./img/unknown.png'">
                 <span>Minecraft</span>
             </div>
             <div class="app-icon" onclick="openApp('Quiz','./img/quiz.png')">
-                <img src="./img/quiz.png" alt="Quiz">
+                <img src="./img/quiz.png" alt="Quiz" onerror="this.src='./img/unknown.png'">
                 <span>Quiz</span>
             </div>
             <div class="app-icon" onclick="openApp('Typing','./img/typing.png')">
-                <img src="./img/typing.png" alt="Typing Test">
+                <img src="./img/typing.png" alt="Typing Test" onerror="this.src='./img/unknown.png'">
                 <span>Typing Test</span>
             </div>
             <div class="app-icon" onclick="openApp('Cheats++','./img/terminal.png')">
-                <img src="./img/terminal.png" alt="Cheats++">
+                <img src="./img/terminal.png" alt="Cheats++" onerror="this.src='./img/unknown.png'">
                 <span>Cheats++</span>
             </div>
             <div class="app-icon" onclick="openApp('Snake','./img/snake.png')">
-                <img src="./img/snake.png" alt="Snake">
+                <img src="./img/snake.png" alt="Snake" onerror="this.src='./img/unknown.png'">
                 <span>Snake</span>
             </div>
             <div class="app-icon" onclick="openApp('VS Code','./img/vscode.png')">
-                <img src="./img/vscode.png" alt="VS Code">
+                <img src="./img/vscode.png" alt="VS Code" onerror="this.src='./img/unknown.png'">
                 <span>VS Code</span>
             </div>
-        </div>
+                                    <div class="app-icon" onclick="openApp('skribbl.io','./img/skribbl.png')">
+                <img src="./img/skribbl.png" alt="skribbl.io" onerror="this.src='./img/unknown.png'">
+                <span>skribbl.io</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Geometry Dash Lite','./img/geometrydash.png')">
+                <img src="./img/geometrydash.png" alt="Geometry Dash Lite" onerror="this.src='./img/unknown.png'">
+                <span>Geometry Dash Lite</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Flappy Bird','./img/flappybird.png')">
+                <img src="./img/flappybird.png" alt="Flappy Bird" onerror="this.src='./img/unknown.png'">
+                <span>Flappy Bird</span>
+            </div>
+                    </div>
 
         <!-- Start Menu -->
         <div id="startMenu" class="start-menu hidden">
@@ -101,61 +113,70 @@
                 <p>Pinned</p>
                 <div class="menu-grid">
                     <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
-                        <img src="./img/settings.png" alt="Settings"><span>Settings</span>
+                        <img src="./img/settings.png" alt="Settings" onerror="this.src='./img/unknown.png'"><span>Settings</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Explorer','./img/files.png')">
-                        <img src="./img/files.png" alt="Files"><span>Files</span>
+                        <img src="./img/files.png" alt="Files" onerror="this.src='./img/unknown.png'"><span>Files</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
-                        <img src="./img/notepad.png" alt="Notes"><span>Notes</span>
+                        <img src="./img/notepad.png" alt="Notes" onerror="this.src='./img/unknown.png'"><span>Notes</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Paint','./img/paint.png')">
-                        <img src="./img/paint.png" alt="Paint"><span>Paint</span>
+                        <img src="./img/paint.png" alt="Paint" onerror="this.src='./img/unknown.png'"><span>Paint</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
-                        <img src="./img/calculator.png" alt="Calc"><span>Calculator</span>
+                        <img src="./img/calculator.png" alt="Calc" onerror="this.src='./img/unknown.png'"><span>Calculator</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Browser','./img/chrome.png')">
-                        <img src="./img/chrome.png" alt="Web"><span>Not Chrome</span>
+                        <img src="./img/chrome.png" alt="Web" onerror="this.src='./img/unknown.png'"><span>Not Chrome</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Terminal','./img/terminal.png')">
-                        <img src="./img/terminal.png" alt="Term"><span>Terminal</span>
+                        <img src="./img/terminal.png" alt="Term" onerror="this.src='./img/unknown.png'"><span>Terminal</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Spotify','./img/spotify.png')">
-                        <img src="./img/spotify.png" alt="Spotify"><span>Spotify</span>
+                        <img src="./img/spotify.png" alt="Spotify" onerror="this.src='./img/unknown.png'"><span>Spotify</span>
                     </div>
                     <div class="menu-item" onclick="openApp('TicTacToe','./img/tictactoe.png')">
-                        <img src="./img/tictactoe.png" alt="TicTacToe"><span>TicTacToe</span>
+                        <img src="./img/tictactoe.png" alt="TicTacToe" onerror="this.src='./img/unknown.png'"><span>TicTacToe</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Minecraft','./img/minecraft.png')">
-                        <img src="./img/minecraft.png" alt="Minecraft"><span>Minecraft</span>
+                        <img src="./img/minecraft.png" alt="Minecraft" onerror="this.src='./img/unknown.png'"><span>Minecraft</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Quiz','./img/quiz.png')">
-                        <img src="./img/quiz.png" alt="Quiz"><span>Quiz</span>
+                        <img src="./img/quiz.png" alt="Quiz" onerror="this.src='./img/unknown.png'"><span>Quiz</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Typing','./img/typing.png')">
-                        <img src="./img/typing.png" alt="Typing"><span>Typing</span>
+                        <img src="./img/typing.png" alt="Typing" onerror="this.src='./img/unknown.png'"><span>Typing</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Cheats++','./img/terminal.png')">
-                        <img src="./img/terminal.png" alt="Cheats++"><span>Cheats++</span>
+                        <img src="./img/terminal.png" alt="Cheats++" onerror="this.src='./img/unknown.png'"><span>Cheats++</span>
                     </div>
                     <div class="menu-item" onclick="openApp('VS Code','./img/vscode.png')">
-                        <img src="./img/vscode.png" alt="VS Code"><span>VS Code</span>
+                        <img src="./img/vscode.png" alt="VS Code" onerror="this.src='./img/unknown.png'"><span>VS Code</span>
                     </div>
                     <div class="menu-item" onclick="openApp('Snake','./img/snake.png')">
-                        <img src="./img/snake.png" alt="Snake"><span>Snake</span>
+                        <img src="./img/snake.png" alt="Snake" onerror="this.src='./img/unknown.png'"><span>Snake</span>
                     </div>
-                </div>
+                                                            <div class="menu-item" onclick="openApp('skribbl.io','./img/skribbl.png')">
+                        <img src="./img/skribbl.png" alt="skribbl.io" onerror="this.src='./img/unknown.png'"><span>skribbl.io</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Geometry Dash Lite','./img/geometrydash.png')">
+                        <img src="./img/geometrydash.png" alt="Geometry Dash Lite" onerror="this.src='./img/unknown.png'"><span>Geometry Dash Lite</span>
+                    </div>
+                    <div class="menu-item" onclick="openApp('Flappy Bird','./img/flappybird.png')">
+                        <img src="./img/flappybird.png" alt="Flappy Bird" onerror="this.src='./img/unknown.png'"><span>Flappy Bird</span>
+                    </div>
+                                    </div>
             </div>
         </div>
 
-        <div class="taskbar">
+                        <div class="taskbar">
             <div class="tb-left">
                 <span class="brand">WinOS</span>
             </div>
             <div class="tb-center">
                 <button class="start-btn" id="startBtn">
-                    <img src="./img/start.png" width="22" alt="Start">
+                    <img src="./img/start.png" width="22" alt="Start" onerror="this.src='./img/unknown.png'">
                 </button>
                 <div id="taskbar-apps" class="task-icons-container"></div>
             </div>

@@ -293,7 +293,7 @@ function handleTerminalCommand(e, termId) {
 
 
 // Apps that fill their content area edge-to-edge (no padding)
-var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing', 'Settings', 'Paint', 'VS Code', 'Snake'];
+var fullBleedApps = ['Explorer', 'Terminal', 'Browser', 'Spotify', 'Calculator', 'TicTacToe', 'Quiz', 'Typing', 'Settings', 'Paint', 'VS Code', 'Snake', 'Minecraft', 'skribbl.io', 'Geometry Dash Lite', 'Flappy Bird'];
 
 // Open a new application window on the desktop
 function openApp(appName, iconPath) {
@@ -938,7 +938,7 @@ function getAppContent(appName, winId) {
         var sid = 'snake-' + winId;
         return '<div id="' + sid + '" style="height:100%; display:flex; flex-direction:column; background:#1a1a2e; font-family:Segoe UI,sans-serif; position:relative; outline:none;" tabindex="0">' +
             '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#16213e;">' +
-            '<span style="font-size:1.3em; font-weight:bold; color:#0f3460;">🐍 <span style="color:#e94560;">Snake</span></span>' +
+            '<span style="font-size:1.3em; font-weight:bold; color:#0f3460;"> <span style="color:#e94560;">Snake</span></span>' +
             '<span id="' + sid + '-score" style="font-size:1em; color:#eee;">Score: 0</span>' +
             '</div>' +
             '<div style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px;">' +
@@ -954,6 +954,15 @@ function getAppContent(appName, winId) {
 
     if (appName === 'Minecraft') {
         return `<iframe src="https://classic.minecraft.net" style="width:100%; height:100%; border:none;"></iframe>`;
+    }
+    if (appName === 'skribbl.io') {
+        return `<iframe src="https://skribbl.io" style="width:100%; height:100%; border:none; background:#000;"></iframe>`;
+    }
+    if (appName === 'Geometry Dash Lite') {
+        return `<iframe src="https://s.geometrydashgames.io/games/geometry-dash-lite/index.html" style="width:100%; height:100%; border:none; background:#000;"></iframe>`;
+    }
+    if (appName === 'Flappy Bird') {
+        return `<iframe src="https://flappybird.io/" style="width:100%; height:100%; border:none; background:#000;"></iframe>`;
     }
     if (appName === 'VS Code') {
         return `<iframe src="https://github1s.com/AnupSharma12/AnupSharma12" style="width:100%; height:100%; border:none; background:#1e1e1e;"></iframe>`;
@@ -1760,7 +1769,7 @@ function addTaskbarIcon(winId, iconPath) {
     var iconDiv = document.createElement('div');
     iconDiv.className = 'task-item';
     iconDiv.id = 'task-' + winId;
-    iconDiv.innerHTML = '<img src="' + iconPath + '">';
+    iconDiv.innerHTML = '<img src="' + iconPath + '" onerror="this.src=\'./img/unknown.png\'">';
 
     // Click to restore a minimized window or bring it to the front
     iconDiv.onclick = function () {
