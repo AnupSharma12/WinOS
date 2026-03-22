@@ -21,7 +21,7 @@ body, html {
 }
 
 body {
-    background: url('./img/wallpaper.jpg') no-repeat center center fixed;
+    background: url('./img/wallpapers/1.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -55,7 +55,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('./img/wallpaper.jpg') no-repeat center center;
+    background: url('./img/wallpapers/1.jpg') no-repeat center center;
     background-size: cover;
     filter: brightness(0.6) blur(1px);
 }
@@ -293,12 +293,67 @@ body {
     display: block;
 }
 
-/* Right section: system clock */
+/* Right section: system tray, clock and date */
 .tb-right {
     flex: 1;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 2px;
     font-size: 12px;
+}
+
+/* System icons group (wifi, sound, battery) */
+.tb-sys-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tb-sys-icons:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tb-sys-icon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(10);
+    object-fit: contain;
+}
+
+.tb-battery-mini {
+    display: flex;
+    align-items: center;
+}
+
+.tb-battery-mini svg {
+    display: block;
+}
+
+/* Date + time block in taskbar */
+.tb-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    line-height: 1.25;
+    transition: background 0.15s;
+}
+
+.tb-datetime:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tb-date {
+    font-size: 10px;
+    opacity: 0.85;
 }
 
 /* Running app indicators in the taskbar */
@@ -950,170 +1005,1044 @@ body {
 
 
 /* --------------------------------------------------------------------------
-   8. Explorer (Files) App
+   8. Explorer (Files) App — Windows 11 Faithful Clone
    -------------------------------------------------------------------------- */
 .explorer-shell {
     display: flex;
     flex-direction: column;
     height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: rgba(238, 241, 245, 0.85); /* Mica effect */
-    color: #1c1c1c;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f3f3f3;
+    color: #1a1a1a;
+    user-select: none;
+    overflow: hidden;
 }
 
-.explorer-toolbar {
+/* ---- Command Bar (Top Ribbon) ---- */
+.explorer-ribbon {
     display: flex;
-    padding: 8px 12px;
+    padding: 4px 12px 4px 4px;
+    border-bottom: 1px solid #e5e5e5;
+    gap: 0;
+    align-items: center;
+    background: #f3f3f3;
+    min-height: 40px;
+}
+
+.explorer-ribbon-sec {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    border-right: 1px solid #e5e5e5;
+    gap: 1px;
+    height: 32px;
+}
+
+.explorer-ribbon-sec:last-child {
+    border-right: none;
+}
+
+.explorer-ribbon-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
     background: transparent;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #1a1a1a;
+    transition: background 0.12s;
+    height: 28px;
+    white-space: nowrap;
+}
+
+.explorer-ribbon-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.explorer-ribbon-btn:active {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.explorer-ribbon-btn img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.explorer-ribbon-btn.primary {
+    background: rgba(0, 120, 212, 0.08);
+}
+
+.explorer-ribbon-btn.primary:hover {
+    background: rgba(0, 120, 212, 0.14);
+}
+
+.explorer-ribbon-sep {
+    width: 1px;
+    height: 20px;
+    background: #e5e5e5;
+    margin: 0 2px;
+}
+
+/* ---- More menu dot button ---- */
+.explorer-ribbon-more {
+    border: none;
+    background: transparent;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #605e5c;
+    margin-left: auto;
+    display: flex;
     align-items: center;
 }
 
-.explorer-tool-btn {
+.explorer-ribbon-more:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* ---- Navigation Toolbar ---- */
+.explorer-toolbar {
+    display: flex;
+    padding: 4px 8px;
+    background: #f3f3f3;
+    gap: 2px;
+    align-items: center;
+    min-height: 36px;
+}
+
+.explorer-nav-btn {
     border: none;
     background: transparent;
-    padding: 6px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
     border-radius: 4px;
-    color: #1c1c1c;
+    color: #605e5c;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.1s;
+    transition: background 0.12s;
+    flex-shrink: 0;
 }
 
-.explorer-tool-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+.explorer-nav-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
 }
 
-.explorer-tool-btn span {
-    font-size: 18px;
+.explorer-nav-btn:active {
+    background: rgba(0, 0, 0, 0.08);
 }
 
+.explorer-nav-btn.disabled {
+    color: #c8c6c4;
+    pointer-events: none;
+}
+
+.explorer-nav-btn .material-symbols-rounded {
+    font-size: 16px;
+}
+
+/* ---- Address Bar (Breadcrumb style) ---- */
 .explorer-address-bar {
     flex: 1;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e5;
     border-radius: 4px;
-    padding: 4px 10px;
+    padding: 0 8px;
     display: flex;
     background: #ffffff;
     align-items: center;
-    gap: 8px;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    gap: 4px;
+    height: 30px;
+    margin: 0 4px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.12s;
+}
+
+.explorer-address-bar:focus-within {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 1px rgba(0, 120, 212, 0.3);
+}
+
+.explorer-address-bar img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .explorer-address-bar input {
     border: none;
     outline: none;
     flex: 1;
-    font-size: 13px;
+    font-size: 12px;
     background: transparent;
-    color: #1c1c1c;
+    color: #1a1a1a;
+    height: 100%;
+    font-family: inherit;
 }
 
+/* Breadcrumb overlay */
+.explorer-breadcrumb {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 4px 0 8px;
+    white-space: nowrap;
+    background: #ffffff;
+    gap: 0;
+    width: calc(100% - 0px);
+    overflow: hidden;
+}
+
+.explorer-breadcrumb-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.explorer-bc-seg {
+    display: flex;
+    align-items: center;
+    padding: 2px 3px;
+    font-size: 12px;
+    color: #1a1a1a;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.1s;
+    flex-shrink: 0;
+}
+
+.explorer-bc-seg:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.explorer-bc-sep {
+    color: #999;
+    font-size: 10px;
+    margin: 0 1px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.explorer-bc-sep .material-symbols-rounded {
+    font-size: 14px;
+    color: #999;
+}
+
+/* ---- Search Bar ---- */
+.explorer-search-bar {
+    width: 200px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 0 8px;
+    background: #ffffff;
+    gap: 6px;
+    height: 30px;
+    flex-shrink: 0;
+    transition: border-color 0.12s;
+}
+
+.explorer-search-bar:focus-within {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 1px rgba(0, 120, 212, 0.3);
+}
+
+.explorer-search-bar img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    opacity: 0.5;
+}
+
+.explorer-search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 12px;
+    background: transparent;
+    color: #1a1a1a;
+    height: 100%;
+    font-family: inherit;
+}
+
+.explorer-search-bar input::placeholder {
+    color: #999;
+}
+
+/* ---- Body container (sidebar + content) ---- */
 .explorer-body {
     display: flex;
     flex: 1;
     overflow: hidden;
+    background: #ffffff;
 }
 
-.explorer-sidebar {
-    width: 200px;
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 12px 8px;
-    background: transparent;
+/* ---- Navigation Pane (Left Sidebar Tree) ---- */
+.explorer-navpane {
+    width: 220px;
+    min-width: 180px;
+    border-right: 1px solid #e5e5e5;
+    padding: 8px 4px;
+    background: #f8f8f8;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    flex-shrink: 0;
 }
 
-.explorer-sidebar-item {
-    padding: 8px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 13px;
+.explorer-navpane::-webkit-scrollbar {
+    width: 3px;
+}
+
+.explorer-navpane::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+}
+
+/* Section header in nav pane */
+.exp-section-header {
+    font-size: 11px;
+    color: #666;
+    padding: 10px 8px 4px 8px;
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.exp-section-header:first-child {
+    padding-top: 2px;
+}
+
+/* Tree dropdown menu items */
+.exp-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.exp-droptitle {
     display: flex;
     align-items: center;
-    gap: 10px;
+    padding: 3px 6px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.1s;
+    position: relative;
+    min-height: 26px;
+}
+
+.exp-droptitle:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.exp-droptitle.active {
+    background: rgba(0, 120, 212, 0.08);
+}
+
+.exp-droptitle.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    background: #0078d4;
+    border-radius: 2px;
+}
+
+.exp-arrow {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #999;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.12s;
+    margin-right: 2px;
+}
+
+.exp-arrow.rotated {
+    transform: rotate(90deg);
+}
+
+.exp-arrow.invisible {
+    visibility: hidden;
+}
+
+.exp-nav-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.exp-nav-label {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #1a1a1a;
+}
+
+.exp-pin-icon {
+    margin-left: auto;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.exp-droptitle:hover .exp-pin-icon {
+    opacity: 0.4;
+}
+
+.exp-dropcontent {
+    padding-left: 14px;
+}
+
+.exp-nav-divider {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 6px 10px;
+}
+
+/* ---- Content Area (File grid / Details view) ---- */
+.explorer-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.explorer-content:focus {
+    outline: none;
+}
+
+.explorer-content-wrap {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 4px 8px 8px 8px;
+}
+
+.explorer-content-wrap::-webkit-scrollbar {
+    width: 6px;
+}
+
+.explorer-content-wrap::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+}
+
+.explorer-content-wrap::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.16);
+}
+
+/* Section header in content area */
+.explorer-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+    padding: 12px 4px 6px 4px;
+}
+
+/* File grid - Medium Icons view (Win11 default) */
+.explorer-file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 96px);
+    gap: 2px;
+    justify-content: start;
+    padding: 0;
+}
+
+.explorer-file-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px 6px 4px;
+    border-radius: 4px;
+    cursor: default;
+    width: 96px;
     transition: background 0.1s;
     position: relative;
 }
 
-.explorer-sidebar-item:hover {
-    background: rgba(0, 0, 0, 0.04);
+.explorer-file-item:hover {
+    background: rgba(0, 0, 0, 0.03);
 }
 
-.explorer-sidebar-item.active {
-    background: rgba(0, 0, 0, 0.06);
-    font-weight: 500;
+.explorer-file-item.selected {
+    background: rgba(0, 120, 212, 0.08);
 }
 
-.explorer-sidebar-item.active::before {
-    content: '';
-    position: absolute;
-    left: 2px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 14px;
-    background: #0078d4;
-    border-radius: 4px;
+.explorer-file-item.selected:hover {
+    background: rgba(0, 120, 212, 0.12);
 }
 
-.explorer-sidebar-icon {
-    font-size: 18px;
-    color: #0078d4;
-    font-variation-settings: 'FILL' 1;
+.explorer-file-item img,
+.explorer-file-item .exp-file-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    pointer-events: none;
 }
 
-.explorer-main {
-    flex: 1;
-    padding: 16px;
-    display: flex;
-    gap: 8px;
-    align-content: flex-start;
-    flex-wrap: wrap;
-    background: #ffffff;
-    overflow-y: auto;
+.explorer-file-item .material-symbols-rounded {
+    font-size: 48px;
+    pointer-events: none;
 }
 
-.explorer-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    width: 80px;
-    height: 85px;
+.explorer-file-item-name {
+    font-size: 12px;
+    margin-top: 4px;
     text-align: center;
+    word-break: break-word;
+    color: #1a1a1a;
+    max-height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+    width: 100%;
+    padding: 0 2px;
+}
+
+.explorer-file-item.renaming .explorer-file-item-name {
+    display: none;
+}
+
+.explorer-file-rename-input {
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid #0078d4;
+    border-radius: 2px;
+    outline: none;
+    padding: 1px 4px;
+    margin-top: 2px;
+    width: 80px;
+    font-family: inherit;
+    background: #fff;
+}
+
+.explorer-empty {
+    padding: 40px 20px;
+    color: #999;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+/* ---- Details View (Table) ---- */
+.explorer-details-header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid #e5e5e5;
+    background: #ffffff;
+    min-height: 28px;
+    font-size: 12px;
+    color: #666;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.explorer-details-header span {
+    padding: 4px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.explorer-details-header span:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.explorer-details-col-name { flex: 1; min-width: 0; }
+.explorer-details-col-date { width: 160px; }
+.explorer-details-col-type { width: 120px; }
+.explorer-details-col-size { width: 80px; text-align: right; }
+
+.explorer-details-row {
+    display: flex;
+    align-items: center;
+    padding: 2px 16px;
+    border-radius: 4px;
+    cursor: default;
+    min-height: 28px;
+    font-size: 12px;
     transition: background 0.1s;
 }
 
-.explorer-item:hover {
-    background: rgba(0, 120, 212, 0.08); /* Windows light blue highlight */
+.explorer-details-row:hover {
+    background: rgba(0, 0, 0, 0.03);
 }
 
-.explorer-item-name {
-    font-size: 11px;
-    margin-top: 6px;
-    word-break: break-all;
-    color: #1c1c1c;
+.explorer-details-row.selected {
+    background: rgba(0, 120, 212, 0.08);
 }
 
+.explorer-details-row img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.explorer-details-row .material-symbols-rounded {
+    font-size: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    width: 18px;
+}
+
+.explorer-details-row span {
+    padding: 2px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---- Status Bar ---- */
 .explorer-statusbar {
-    padding: 4px 12px;
-    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 12px;
+    background: #f3f3f3;
     font-size: 11px;
-    color: #605e5c;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    color: #666;
+    border-top: 1px solid #e5e5e5;
+    min-height: 24px;
+    flex-shrink: 0;
+}
+
+.explorer-view-btns {
+    display: flex;
+    gap: 2px;
+}
+
+.explorer-view-btn {
+    border: none;
+    background: transparent;
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+}
+
+.explorer-view-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+    opacity: 0.7;
+}
+
+.explorer-view-btn.active {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.explorer-view-btn img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+/* ---- Context Menu (Right-click) ---- */
+.explorer-ctx-menu {
+    position: fixed;
+    background: #fcfcfc;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 4px 0;
+    min-width: 200px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 10000;
+    font-size: 12px;
+    color: #1a1a1a;
+    backdrop-filter: blur(20px);
+    animation: ctxFade 0.1s ease;
+}
+
+@keyframes ctxFade {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.explorer-ctx-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.08s;
+}
+
+.explorer-ctx-item:hover {
+    background: rgba(0, 120, 212, 0.06);
+}
+
+.explorer-ctx-item img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.explorer-ctx-item .material-symbols-rounded {
+    font-size: 16px;
+    width: 16px;
+    color: #555;
+}
+
+.explorer-ctx-sep {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 4px 12px;
+}
+
+/* Quick access pins row */
+.explorer-quick-pins {
+    display: flex;
+    gap: 4px;
+    padding: 4px 12px 4px 8px;
+    flex-wrap: wrap;
+}
+
+.explorer-quick-pin {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.1s;
+}
+
+.explorer-quick-pin:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.explorer-quick-pin img {
+    width: 16px;
+    height: 16px;
+}
+
+/* ---- Home page layout ---- */
+.explorer-home {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
+    gap: 12px;
+}
+
+.explorer-home-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.explorer-home-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+    padding: 4px 0;
+}
+
+.explorer-home-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.explorer-home-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.1s;
+    min-width: 180px;
+}
+
+.explorer-home-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.explorer-home-item img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.explorer-home-item-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.explorer-home-item-text span:first-child {
+    font-size: 13px;
+    color: #1a1a1a;
+}
+
+.explorer-home-item-text span:last-child {
+    font-size: 11px;
+    color: #999;
+}
+
+/* --------------------------------------------------------------------------
+   9. Action Center (Quick Settings Panel)
+   -------------------------------------------------------------------------- */
+.action-center {
+    position: fixed;
+    bottom: 52px;
+    right: 12px;
+    width: 340px;
+    background: rgba(32, 32, 32, 0.92);
+    backdrop-filter: saturate(3) blur(20px);
+    border-radius: 12px;
+    padding: 16px;
+    color: #fff;
+    z-index: 9500;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    animation: acSlideUp 0.2s ease;
+}
+
+@keyframes acSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ac-top {
+    margin-bottom: 16px;
+}
+
+.ac-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.ac-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    cursor: pointer;
+    font-size: 10px;
+    transition: all 0.15s;
+}
+
+.ac-tile:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.ac-tile.active {
+    background: #0078d4;
+    color: #fff;
+}
+
+.ac-tile.active:hover {
+    background: #106ebe;
+}
+
+.ac-tile img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(10);
+    object-fit: contain;
+}
+
+.ac-tile span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.ac-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.ac-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ac-slider-row img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(10);
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.ac-slider-row input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+}
+
+.ac-slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #0078d4;
+    cursor: pointer;
+    border: 2px solid #fff;
+}
+
+.ac-slider-row span {
+    width: 36px;
+    text-align: right;
+    font-size: 11px;
+    color: #aaa;
+    flex-shrink: 0;
+}
+
+.ac-battery-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+}
+
+.ac-battery-icon {
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.ac-battery-label {
+    margin-left: auto;
+    color: #888;
+    font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+   10. Calendar Panel
+   -------------------------------------------------------------------------- */
+.calendar-panel {
+    position: fixed;
+    bottom: 52px;
+    right: 12px;
+    width: 300px;
+    background: rgba(32, 32, 32, 0.92);
+    backdrop-filter: saturate(3) blur(20px);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    z-index: 9500;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    animation: acSlideUp 0.2s ease;
+}
+
+.cal-time {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -1px;
+}
+
+.cal-date {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 16px;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.cal-grid .cal-header {
+    font-size: 10px;
+    color: #888;
+    padding: 4px 0;
+    font-weight: 600;
+}
+
+.cal-grid .cal-day {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: auto;
+    cursor: default;
+    transition: background 0.1s;
+}
+
+.cal-grid .cal-day:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.cal-grid .cal-day.today {
+    background: #0078d4;
+    color: #fff;
+    font-weight: 600;
+}
+
+.cal-grid .cal-day.other {
+    color: #555;
+}
+
+/* Night light overlay filter */
+.nightlight-active {
+    filter: sepia(0.25) saturate(1.3);
 }
 
 
 /* --------------------------------------------------------------------------
-    9. Utility Classes
+    11. Utility Classes
    -------------------------------------------------------------------------- */
 
 .hidden {
@@ -1126,7 +2055,7 @@ body {
 
 
 /* --------------------------------------------------------------------------
-    10. Keyframe Animations
+    12. Keyframe Animations
    -------------------------------------------------------------------------- */
 
 /* Blinking cursor for terminal-like elements */

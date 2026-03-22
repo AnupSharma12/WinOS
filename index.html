@@ -170,6 +170,64 @@
             </div>
         </div>
 
+        <!-- Action Center / Quick Settings Panel (toggled from taskbar) -->
+        <div id="actionCenter" class="action-center hidden">
+            <div class="ac-top">
+                <div class="ac-quick-grid">
+                    <button class="ac-tile active" id="ac-wifi" onclick="acToggle('wifi')">
+                        <img src="./img/icon/ui/wifi.png" width="18" alt="WiFi">
+                        <span>Wi-Fi</span>
+                    </button>
+                    <button class="ac-tile active" id="ac-bluetooth" onclick="acToggle('bluetooth')">
+                        <img src="./img/icon/ui/bluetooth.png" width="18" alt="Bluetooth">
+                        <span>Bluetooth</span>
+                    </button>
+                    <button class="ac-tile" id="ac-airplane" onclick="acToggle('airplane')">
+                        <img src="./img/icon/ui/airplane.png" width="18" alt="Flight Mode">
+                        <span>Flight Mode</span>
+                    </button>
+                    <button class="ac-tile" id="ac-saver" onclick="acToggle('saver')">
+                        <img src="./img/icon/ui/saver.png" width="18" alt="Battery Saver">
+                        <span>Battery Saver</span>
+                    </button>
+                    <button class="ac-tile" id="ac-nightlight" onclick="acToggle('nightlight')">
+                        <img src="./img/icon/ui/nightlight.png" width="18" alt="Night Light">
+                        <span>Night Light</span>
+                    </button>
+                    <button class="ac-tile" id="ac-location" onclick="acToggle('location')">
+                        <img src="./img/icon/ui/location.png" width="18" alt="Location">
+                        <span>Location</span>
+                    </button>
+                </div>
+            </div>
+            <div class="ac-sliders">
+                <div class="ac-slider-row">
+                    <img src="./img/icon/ui/brightness.png" width="16" alt="Brightness">
+                    <input type="range" id="ac-brightness" min="20" max="100" value="100" oninput="acBrightness(this.value)">
+                    <span id="ac-brightness-val">100%</span>
+                </div>
+                <div class="ac-slider-row">
+                    <img src="./img/icon/ui/audio2.png" width="16" alt="Volume" id="ac-vol-icon">
+                    <input type="range" id="ac-volume" min="0" max="100" value="70" oninput="acVolume(this.value)">
+                    <span id="ac-volume-val">70%</span>
+                </div>
+            </div>
+            <div class="ac-battery-row">
+                <div class="ac-battery-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M17 6a3 3 0 0 1 3 3v1h1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1v1a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h12Zm-.002 1.5H5a1.5 1.5 0 0 0-1.493 1.356L3.5 9v6a1.5 1.5 0 0 0 1.355 1.493L5 16.5h11.998a1.5 1.5 0 0 0 1.493-1.355l.007-.145V9a1.5 1.5 0 0 0-1.355-1.493l-.145-.007ZM6 9h10a1 1 0 0 1 .993.883L17 10v4a1 1 0 0 1-.883.993L16 15H6a1 1 0 0 1-.993-.883L5 14v-4a1 1 0 0 1 .883-.993L6 9h10H6Z"/></svg>
+                </div>
+                <span id="ac-battery-pct">100%</span>
+                <span class="ac-battery-label" id="ac-battery-status">Plugged in</span>
+            </div>
+        </div>
+
+        <!-- Calendar Panel (toggled from taskbar date/time) -->
+        <div id="calendarPanel" class="calendar-panel hidden">
+            <div class="cal-time" id="cal-time">--:--</div>
+            <div class="cal-date" id="cal-date">---</div>
+            <div class="cal-grid" id="cal-grid"></div>
+        </div>
+
                         <div class="taskbar">
             <div class="tb-left">
                 <span class="brand">WinOS</span>
@@ -181,7 +239,17 @@
                 <div id="taskbar-apps" class="task-icons-container"></div>
             </div>
             <div class="tb-right">
-                <div id="clock">Clock Broken</div>
+                <div class="tb-sys-icons" id="tbSysIcons" onclick="toggleActionCenter(event)">
+                    <img src="./img/icon/ui/wifi.png" width="16" alt="WiFi" class="tb-sys-icon" id="tb-wifi-icon">
+                    <img src="./img/icon/ui/audio2.png" width="16" alt="Sound" class="tb-sys-icon" id="tb-audio-icon">
+                    <div class="tb-battery-mini" title="Battery: 100%">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M17 6a3 3 0 0 1 3 3v1h1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1v1a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h12Zm-.002 1.5H5a1.5 1.5 0 0 0-1.493 1.356L3.5 9v6a1.5 1.5 0 0 0 1.355 1.493L5 16.5h11.998a1.5 1.5 0 0 0 1.493-1.355l.007-.145V9a1.5 1.5 0 0 0-1.355-1.493l-.145-.007ZM6 9h10a1 1 0 0 1 .993.883L17 10v4a1 1 0 0 1-.883.993L16 15H6a1 1 0 0 1-.993-.883L5 14v-4a1 1 0 0 1 .883-.993L6 9h10H6Z"/></svg>
+                    </div>
+                </div>
+                <div class="tb-datetime" id="tbDateTime" onclick="toggleCalendar(event)">
+                    <div id="clock">Clock Broken</div>
+                    <div id="clock-date" class="tb-date"></div>
+                </div>
             </div>
         </div>
 
