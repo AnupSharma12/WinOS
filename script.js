@@ -757,54 +757,237 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ========== Terminal ==========
-function handleTerminalCommand(e, termId) {
-    if (e.key !== 'Enter') return;
-    var input = document.getElementById(termId);
-    var output = document.getElementById(termId + '-output');
-    var cmd = input.value.trim();
-    input.value = '';
-    var result = '';
+// ========== Command Prompt (Terminal) ==========
+var cmdStates = {};
 
-    output.innerHTML += '<div><span style="color:#189a18;">' + terminalPath + '&gt;</span> ' + cmd + '</div>';
+function cmdGetDirFolders(pwd) {
+    var node = getVfsNode(pwd);
+    if (!node || node.type !== 'dir') return [];
+    return Object.keys(node.children);
+}
 
-    if (cmd) {
-        var args = cmd.split(' ');
-        var command = args[0].toLowerCase();
-        var node = getVfsNode(terminalPath);
+function cmdColorCode(c) {
+    var map = {
+        '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+        '4': '#AA0000', '5': '#AA00AA', '6': '#AA5500', '7': '#AAAAAA',
+        '8': '#555555', '9': '#5555FF', 'A': '#55FF55', 'B': '#55FFFF',
+        'C': '#FF5555', 'D': '#FF55FF', 'E': '#FFFF55', 'F': '#FFFFFF'
+    };
+    return map[(c || '').toUpperCase()] || '#FFFFFF';
+}
 
-        if (command === 'help') {
-            result = 'Commands: cd, dir, cls, help';
+function cmdProcessCommand(termId, cmd) {
+    var state = cmdStates[termId];
+    if (!state) return;
 
-        } else if (command === 'cd') {
-            if (args[1]) {
-                var targetPath = resolvePath(terminalPath, args.slice(1).join(' '));
-                if (getVfsNode(targetPath)) {
-                    terminalPath = normalizeVfsPath(targetPath);
-                } else {
-                    result = 'Path not found.';
+    var stack = state.stack;
+    stack.push(state.pwd + '>' + cmd);
+
+    var arr = cmd.split(' ');
+    var type = arr[0].trim().toLowerCase();
+    var arg = arr.splice(1).join(' ').trim();
+
+    if (type === 'echo') {
+        stack.push(arg.length ? arg : 'ECHO is on.');
+    } else if (type === 'cd') {
+        if (arg.length) {
+            if (arg === '.') {
+                // stay
+            } else if (arg === '..') {
+                var parts = state.pwd.replace('C:\\', '').split('\\').filter(function(p) { return p; });
+                parts.pop();
+                state.pwd = parts.length ? 'C:\\' + parts.join('\\') : 'C:\\';
+            } else if (!arg.includes('.')) {
+                var dirs = cmdGetDirFolders(state.pwd);
+                var found = false;
+                for (var i = 0; i < dirs.length; i++) {
+                    if (arg.toLowerCase() === dirs[i].toLowerCase()) {
+                        state.pwd = state.pwd + '\\' + dirs[i];
+                        state.pwd = normalizeVfsPath(state.pwd);
+                        found = true;
+                        break;
+                    }
                 }
+                if (!found) stack.push('The system cannot find the path specified.');
             } else {
-                result = terminalPath;
+                stack.push('The directory name is invalid.');
             }
-
-        } else if (command === 'dir' || command === 'ls') {
-            if (node && node.children) {
-                var keys = Object.keys(node.children);
-                result = keys.map(function (k) { return (node.children[k].type === 'dir' ? '📁 ' : '📄 ') + k; }).join('<br>') || 'Empty';
-            }
-
-        } else if (command === 'cls' || command === 'clear') {
-            output.innerHTML = '';
         } else {
-            result = '"' + command + '" is not recognized. Type help.';
+            stack.push(state.pwd);
         }
+    } else if (type === 'dir') {
+        stack.push(' Directory of ' + state.pwd);
+        stack.push('');
+        stack.push('&lt;DIR&gt;    .');
+        stack.push('&lt;DIR&gt;    ..');
+        var dirs = cmdGetDirFolders(state.pwd);
+        for (var i = 0; i < dirs.length; i++) {
+            var childNode = getVfsNode(state.pwd + '\\' + dirs[i]);
+            if (childNode && childNode.type === 'dir') {
+                stack.push('&lt;DIR&gt;    ' + dirs[i]);
+            } else {
+                stack.push('         ' + dirs[i]);
+            }
+        }
+    } else if (type === 'cls') {
+        state.stack = [];
+        state.lastCmd = 0;
+        cmdRender(termId);
+        return;
+    } else if (type === 'color') {
+        var re = /^[A-Fa-f0-9]+$/;
+        if (!arg || (arg.length < 3 && re.test(arg))) {
+            var color = '#FFFFFF', bg = '#0c0c0c';
+            if (arg.length === 2) { color = cmdColorCode(arg[1]); bg = cmdColorCode(arg[0]); }
+            else if (arg.length === 1) { color = cmdColorCode(arg[0]); }
+            var cont = document.getElementById(termId + '-cont');
+            if (cont) { cont.style.backgroundColor = bg; cont.style.color = color; }
+        } else {
+            stack.push('Sets the default console foreground and background colors.');
+            stack.push('COLOR [attr]');
+            stack.push('');
+            stack.push('  0 = Black    8 = Gray');
+            stack.push('  1 = Blue     9 = Light Blue');
+            stack.push('  2 = Green    A = Light Green');
+            stack.push('  3 = Cyan     B = Light Cyan');
+            stack.push('  4 = Red      C = Light Red');
+            stack.push('  5 = Magenta  D = Light Magenta');
+            stack.push('  6 = Brown    E = Yellow');
+            stack.push('  7 = Lt Gray  F = White');
+        }
+    } else if (type === 'date') {
+        stack.push('The current date is: ' + new Date().toLocaleDateString());
+    } else if (type === 'time') {
+        stack.push('The current time is: ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '.') + '.' + Math.floor(Math.random() * 100));
+    } else if (type === 'systeminfo') {
+        var info = [
+            'Host Name:                 WINOS-PC',
+            'OS Name:                   WinOS 11 Home',
+            'OS Version:                10.0.22000 N/A Build 22000.51',
+            'OS Configuration:          Standalone Workstation',
+            'OS Build Type:             Multiprocessor Free',
+            'Registered Owner:          Anup',
+            'Product ID:                W1N0S-H0M3-ED1T10N',
+        ];
+        for (var i = 0; i < info.length; i++) stack.push(info[i]);
+    } else if (type === 'ipconfig') {
+        stack.push('Windows IP Configuration');
+        stack.push('');
+        stack.push('Ethernet adapter Local Area Connection:');
+        stack.push('   IPv4 Address. . . . . . . : 192.168.1.' + Math.floor(Math.random() * 254 + 1));
+        stack.push('   Subnet Mask . . . . . . . : 255.255.255.0');
+        stack.push('   Default Gateway . . . . . : 192.168.1.1');
+    } else if (type === 'exit') {
+        var winEl = document.getElementById(termId + '-cont');
+        if (winEl) {
+            var win = winEl.closest('.window');
+            if (win) closeApp(win.id);
+        }
+        return;
+    } else if (type === 'help') {
+        var helpArr = [
+            'CD             Changes the current directory.',
+            'CLS            Clears the screen.',
+            'COLOR          Sets console foreground and background colors.',
+            'DATE           Displays the date.',
+            'DIR            Lists files and subdirectories.',
+            'ECHO           Displays messages.',
+            'EXIT           Exits the command prompt.',
+            'HELP           Lists available commands.',
+            'IPCONFIG       Displays IP configuration.',
+            'SYSTEMINFO     Displays system information.',
+            'TIME           Displays the current time.',
+        ];
+        for (var i = 0; i < helpArr.length; i++) stack.push(helpArr[i]);
+    } else if (type === '') {
+        // empty command
+    } else {
+        stack.push('\'' + type + '\' is not recognized as an internal or external command,');
+        stack.push('operable program or batch file.');
+        stack.push('');
+        stack.push('Type "help" for available commands.');
     }
 
-    if (result) output.innerHTML += '<div style="margin-bottom:8px;">' + result + '</div>';
-    var promptEl = document.getElementById(termId + '-prompt');
-    if (promptEl) promptEl.textContent = terminalPath + '>';
-    output.scrollTop = output.scrollHeight;
+    if (type.length > 0) stack.push('');
+    cmdRender(termId);
+}
+
+function cmdRender(termId) {
+    var state = cmdStates[termId];
+    if (!state) return;
+    var cont = document.getElementById(termId + '-cont');
+    if (!cont) return;
+
+    var stackDiv = cont.querySelector('.cmd-stack');
+    var html = '';
+    for (var i = 0; i < state.stack.length; i++) {
+        html += '<pre class="cmd-line">' + state.stack[i] + '</pre>';
+    }
+    stackDiv.innerHTML = html;
+
+    var promptLine = cont.querySelector('.cmd-active-line .cmd-prompt-text');
+    if (promptLine) promptLine.textContent = state.pwd + '>';
+
+    cont.scrollTop = cont.scrollHeight;
+}
+
+function cmdAction(termId, event) {
+    var state = cmdStates[termId];
+    if (!state) return;
+    var curcmd = document.getElementById(termId + '-curcmd');
+    if (!curcmd) return;
+
+    var action = event.target.dataset.action || event.currentTarget.dataset.action;
+    if (action === 'hover') {
+        var cont = document.getElementById(termId + '-cont');
+        if (cont) cont.scrollTop = cont.scrollHeight;
+        curcmd.focus();
+    } else if (action === 'enter') {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            var cmd = curcmd.innerText.trim();
+            curcmd.innerText = '';
+            state.lastCmd = state.stack.length + 1;
+            cmdProcessCommand(termId, cmd);
+        } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            var dir = event.key === 'ArrowUp' ? -1 : 1;
+            var idx = state.lastCmd + dir;
+            while (idx >= 0 && idx < state.stack.length) {
+                if (state.stack[idx].indexOf('>') !== -1 && state.stack[idx].indexOf('C:\\') === 0) {
+                    var parts = state.stack[idx].split('>');
+                    curcmd.innerText = parts.slice(1).join('>') || '';
+                    state.lastCmd = idx;
+                    break;
+                }
+                idx += dir;
+            }
+            curcmd.focus();
+        } else if (event.key === 'Tab') {
+            event.preventDefault();
+            var text = curcmd.innerText.trim();
+            var parts = text.split(' ');
+            var partial = parts.length > 1 ? parts.slice(1).join(' ') : '';
+            if (partial.length) {
+                var dirs = cmdGetDirFolders(state.pwd);
+                for (var i = 0; i < dirs.length; i++) {
+                    if (dirs[i].toLowerCase().indexOf(partial.toLowerCase()) === 0) {
+                        curcmd.innerText = parts[0] + ' ' + dirs[i];
+                        break;
+                    }
+                }
+            }
+        }
+        curcmd.focus();
+    }
+}
+
+function cmdInit(termId) {
+    cmdStates[termId] = {
+        stack: ['WinOS [Version 10.0.22000.51]', ''],
+        pwd: 'C:\\Users\\Anup',
+        lastCmd: 0
+    };
 }
 
 // ========== WINDOW MANAGEMENT ==========
@@ -834,6 +1017,7 @@ function openApp(appName, iconPath) {
     else if (appName === 'Settings') { winW = 960; winH = 640; }
     else if (appName === 'Paint') { winW = 900; winH = 590; }
     else if (appName === 'Terminal') { winW = 720; winH = 480; }
+    else if (appName === 'Browser') { winW = 1000; winH = 640; }
     else if (appName === 'Notepad') { winW = 660; winH = 520; }
     else if (appName === 'TicTacToe') { winW = 420; winH = 480; }
     else if (appName === 'Quiz') { winW = 640; winH = 540; }
@@ -1068,28 +1252,42 @@ function browserInit(frameId, inputId) {
     if (browserState[frameId]) return;
     var frame = document.getElementById(frameId);
     if (!frame) return;
-    var startUrl = frame.getAttribute('src') || 'https://en.wikipedia.org';
+    var startUrl = frame.getAttribute('src') || 'https://bing.com';
     browserState[frameId] = { history: [startUrl], index: 0, inputId: inputId };
     var input = document.getElementById(inputId);
     if (input) input.value = startUrl;
 }
 
-function browserNavigate(frameId, inputId, url) {
+function edgeNavigate(frameId, inputId, rawUrl) {
     var frame = document.getElementById(frameId);
     if (!frame) return;
     browserInit(frameId, inputId);
 
-    var state = browserState[frameId];
-    var nextUrl = url;
-    if (nextUrl.indexOf('http') !== 0) nextUrl = 'https://' + nextUrl;
+    var url = rawUrl.trim();
+    // Check if it looks like a URL
+    var urlPattern = /^(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b/;
+    if (urlPattern.test(url)) {
+        if (url.indexOf('http') !== 0) url = 'https://' + url;
+    } else {
+        url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
+    }
 
+    var state = browserState[frameId];
     state.history = state.history.slice(0, state.index + 1);
-    state.history.push(nextUrl);
+    state.history.push(url);
     state.index = state.history.length - 1;
 
-    frame.src = nextUrl;
+    frame.src = url;
     var input = document.getElementById(inputId);
-    if (input) input.value = nextUrl;
+    if (input) input.value = url;
+}
+
+function edgeBookmarkNav(frameId, inputId, url) {
+    edgeNavigate(frameId, inputId, url);
+}
+
+function browserNavigate(frameId, inputId, url) {
+    edgeNavigate(frameId, inputId, url);
 }
 
 function browserReload(frameId) {
@@ -1491,16 +1689,14 @@ function getAppContent(appName, winId) {
 
     if (appName === 'Terminal') {
         var termId = 'term-' + winId;
-        return '<div style="background:#0c0c0c; color:#cccccc; height:100%; padding:10px; font-family:Cascadia Code,Consolas,monospace; font-size:14px; display:flex; flex-direction:column; cursor:text;" onclick="document.getElementById(\'' + termId + '\').focus()">' +
-            '<div id="' + termId + '-output" style="overflow-y:auto; flex:1; margin-bottom:10px;">' +
-            '<div style="color:#fff; font-weight:bold;">WinOS Terminal</div>' +
-            '<div>Copyright (C) WinOS. All rights reserved.</div>' +
-            '<div style="color:#9bd59b;">Commands: cd, dir, ls, cls, help</div>' +
-            '<br>' +
+        setTimeout(function() { cmdInit(termId); }, 50);
+        return '<div id="' + termId + '-cont" class="cmd-container" data-action="hover" onclick="cmdAction(\'' + termId + '\', event)" onmouseover="cmdAction(\'' + termId + '\', event)">' +
+            '<div class="cmd-scroll">' +
+            '<div class="cmd-stack"></div>' +
+            '<div class="cmd-active-line">' +
+            '<span class="cmd-prompt-text">C:\\Users\\Anup&gt;</span>' +
+            '<div class="cmd-input" id="' + termId + '-curcmd" contenteditable="true" spellcheck="false" data-action="enter" onkeydown="cmdAction(\'' + termId + '\', event)"></div>' +
             '</div>' +
-            '<div style="display:flex; align-items:center;">' +
-            '<span id="' + termId + '-prompt" style="margin-right:8px; color:#189a18;">' + terminalPath + '></span>' +
-            '<input id="' + termId + '" type="text" style="flex:1; background:transparent; border:none; color:#cccccc; outline:none; font-family:Cascadia Code,Consolas,monospace; font-size:14px;" onkeydown="handleTerminalCommand(event, \'' + termId + '\')" autofocus>' +
             '</div>' +
             '</div>';
     }
@@ -1583,16 +1779,38 @@ function getAppContent(appName, winId) {
     if (appName === 'Browser') {
         var frameId = 'browser-frame-' + winId;
         var inputId = frameId + '-input';
-        return '<div style="height:100%; display:flex; flex-direction:column;">' +
-            '<div style="display:flex; padding:8px; background:#f1f3f4; border-bottom:1px solid #ccc; align-items:center; gap:10px;">' +
-            '<div style="display:flex; gap:5px;">' +
-            '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserGoBack(\'' + frameId + '\')">⬅️</button>' +
-            '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserGoForward(\'' + frameId + '\')">➡️</button>' +
-            '<button style="border:none; background:transparent; cursor:pointer; font-size:16px;" onclick="browserReload(\'' + frameId + '\')">🔄</button>' +
+        var bookmarks = [
+            { url: 'https://www.google.com/webhp?igu=1', name: 'Google' },
+            { url: 'https://en.wikipedia.org', name: 'Wikipedia' },
+        ];
+        var bookmarkHtml = '';
+        for (var bi = 0; bi < bookmarks.length; bi++) {
+            var bk = bookmarks[bi];
+            bookmarkHtml += '<div class="chrome-bookmark" onclick="edgeBookmarkNav(\'' + frameId + '\', \'' + inputId + '\', \'' + bk.url + '\')">' +
+                '<img src="https://' + new URL(bk.url).hostname + '/favicon.ico" width="14" height="14" onerror="this.style.display=\'none\'">' +
+                '<span>' + bk.name + '</span></div>';
+        }
+
+        return '<div class="chrome-browser">' +
+            '<div class="chrome-tab-bar">' +
+            '<div class="chrome-tab active"><img src="./img/chrome.png" width="14" height="14"><span>New Tab</span></div>' +
             '</div>' +
-            '<input id="' + inputId + '" type="text" value="https://en.wikipedia.org" style="flex:1; padding:6px 12px; border-radius:15px; border:1px solid #ddd; outline:none;" onkeydown="if(event.key===\'Enter\'){ browserNavigate(\'' + frameId + '\', \'' + inputId + '\', this.value); }">' +
+            '<div class="chrome-toolbar">' +
+            '<img class="chrome-nav-btn" src="./img/icon/ui/left.png" width="14" onclick="browserGoBack(\'' + frameId + '\')" title="Back">' +
+            '<img class="chrome-nav-btn" src="./img/icon/ui/right.png" width="14" onclick="browserGoForward(\'' + frameId + '\')" title="Forward">' +
+            '<img class="chrome-nav-btn" src="./img/icon/ui/refresh.png" width="14" onclick="browserReload(\'' + frameId + '\')" title="Reload">' +
+            '<div class="chrome-address-bar">' +
+            '<input id="' + inputId + '" type="text" value="https://www.google.com/webhp?igu=1" placeholder="Search Google or type a URL" onkeydown="if(event.key===\'Enter\'){ edgeNavigate(\'' + frameId + '\', \'' + inputId + '\', this.value); }">' +
             '</div>' +
-            '<iframe id="' + frameId + '" src="https://en.wikipedia.org/wiki/Special:Random" style="flex:1; width:100%; border:none;" onload="browserInit(\'' + frameId + '\', \'' + inputId + '\')"></iframe>' +
+            '</div>' +
+            '<div class="chrome-bookmarks-bar">' + bookmarkHtml + '</div>' +
+            '<div class="chrome-site-frame">' +
+            '<iframe id="' + frameId + '" src="https://www.google.com/webhp?igu=1" frameborder="0" onload="browserInit(\'' + frameId + '\', \'' + inputId + '\')"></iframe>' +
+            '<div class="chrome-info-banner" id="' + frameId + '-banner">' +
+            '<div class="chrome-banner-close" onclick="this.parentElement.style.display=\'none\'">x</div>' +
+            '<div class="chrome-banner-text">If it shows <b>"Refused to connect"</b>, that website doesn\'t allow embedding. This cannot be fixed.</div>' +
+            '</div>' +
+            '</div>' +
             '</div>';
     }
 
