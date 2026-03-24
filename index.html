@@ -105,68 +105,72 @@
                     </div>
 
         <!-- Start Menu -->
-        <div id="startMenu" class="start-menu hidden">
-            <div class="search-bar">
-                <input type="text" placeholder="Search apps...  (Coming Soon)" disabled>
+        <div id="startMenu" class="start-menu hidden" data-show-all="false" onclick="event.stopPropagation()">
+            <!-- Pinned view (default) -->
+            <div class="sm-pinned-view" id="smPinnedView">
+                <div class="sm-search">
+                    <svg class="sm-search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10 2.5a7.5 7.5 0 0 1 5.964 12.048l4.743 4.745a.75.75 0 0 1-1.06 1.06l-4.744-4.743A7.5 7.5 0 1 1 10 2.5Zm0 1.5a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z" fill="currentColor"/></svg>
+                    <input type="text" id="smSearchInput" placeholder="Search for apps" oninput="smSearch(this.value)">
+                </div>
+                <!-- Search results (hidden by default) -->
+                <div class="sm-search-results hidden" id="smSearchResults"></div>
+                <!-- Pinned section -->
+                <div class="sm-section" id="smPinnedSection">
+                    <div class="sm-section-bar">
+                        <span class="sm-section-title">Pinned</span>
+                        <button class="sm-pill-btn" onclick="smToggleAllApps()">All apps <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M2.5 0L6.5 4L2.5 8z"/></svg></button>
+                    </div>
+                    <div class="sm-pinned-grid" id="smPinnedGrid">
+                        <!-- populated by JS -->
+                    </div>
+                </div>
+                <!-- Recommended section -->
+                <div class="sm-section">
+                    <div class="sm-section-bar">
+                        <span class="sm-section-title">Recommended</span>
+                    </div>
+                    <div class="sm-recommended" id="smRecommended">
+                        <!-- populated by JS -->
+                    </div>
+                </div>
             </div>
-            <div class="pinned-section">
-                <p>Pinned</p>
-                <div class="menu-grid">
-                    <div class="menu-item" onclick="openApp('Settings','./img/settings.png')">
-                        <img src="./img/settings.png" alt="Settings" onerror="this.src='./img/unknown.png'"><span>Settings</span>
+            <!-- All Apps view (slides in) -->
+            <div class="sm-allapps-view" id="smAllAppsView">
+                <div class="sm-section-bar" style="padding:28px 40px 0">
+                    <span class="sm-section-title">All apps</span>
+                    <button class="sm-pill-btn" onclick="smToggleAllApps()"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M5.5 0L1.5 4L5.5 8z"/></svg> Back</button>
+                </div>
+                <div class="sm-allapps-list" id="smAllAppsList">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+            <!-- Bottom bar: User + Power -->
+            <div class="sm-bottom-bar">
+                <div class="sm-user">
+                    <div class="sm-avatar">A</div>
+                    <span class="sm-username">Anup</span>
+                </div>
+                <div class="sm-power" id="smPowerBtn" onclick="smTogglePower(event)">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.204 4.82a.75.75 0 0 1 .634 1.36A7.51 7.51 0 0 0 4.5 12.991c0 4.148 3.358 7.51 7.499 7.51s7.499-3.362 7.499-7.51a7.51 7.51 0 0 0-4.323-6.804.75.75 0 1 1 .637-1.358 9.01 9.01 0 0 1 5.186 8.162c0 4.976-4.029 9.01-9 9.01C7.029 22 3 17.966 3 12.99a9.01 9.01 0 0 1 5.204-8.17ZM12 2.496a.75.75 0 0 1 .743.648l.007.102v7.5a.75.75 0 0 1-1.493.102l-.007-.102v-7.5a.75.75 0 0 1 .75-.75Z" fill="currentColor"/></svg>
+                </div>
+                <div class="sm-power-menu hidden" id="smPowerMenu">
+                    <div class="sm-power-item" onclick="smPowerAction('lock')">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4v2h1.75A2.25 2.25 0 0 1 20 10.25v9.5A2.25 2.25 0 0 1 17.75 22H6.25A2.25 2.25 0 0 1 4 19.75v-9.5A2.25 2.25 0 0 1 6.25 8H8V6a4 4 0 0 1 4-4Zm5.75 7.5H6.25a.75.75 0 0 0-.75.75v9.5c0 .414.336.75.75.75h11.5a.75.75 0 0 0 .75-.75v-9.5a.75.75 0 0 0-.75-.75Zm-5.75 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm0-10A2.5 2.5 0 0 0 9.5 6v2h5V6A2.5 2.5 0 0 0 12 3.5Z" fill="currentColor"/></svg>
+                        <span>Lock</span>
                     </div>
-                    <div class="menu-item" onclick="openApp('Explorer','./img/files.png')">
-                        <img src="./img/files.png" alt="Files" onerror="this.src='./img/unknown.png'"><span>Files</span>
+                    <div class="sm-power-item" onclick="smPowerAction('sleep')">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10 0-.463-.694-.54-.933-.143a6.5 6.5 0 0 1-8.924 2.424A6.5 6.5 0 0 1 9.857 3.076C10.254 2.836 10.177 2.142 9.714 2.142A10 10 0 1 0 12 22Z" fill="currentColor"/></svg>
+                        <span>Sleep</span>
                     </div>
-                    <div class="menu-item" onclick="openApp('Notepad','./img/notepad.png')">
-                        <img src="./img/notepad.png" alt="Notes" onerror="this.src='./img/unknown.png'"><span>Notes</span>
+                    <div class="sm-power-item" onclick="smPowerAction('shutdown')">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M8.204 4.82a.75.75 0 0 1 .634 1.36A7.51 7.51 0 0 0 4.5 12.991c0 4.148 3.358 7.51 7.499 7.51s7.499-3.362 7.499-7.51a7.51 7.51 0 0 0-4.323-6.804.75.75 0 1 1 .637-1.358 9.01 9.01 0 0 1 5.186 8.162c0 4.976-4.029 9.01-9 9.01C7.029 22 3 17.966 3 12.99a9.01 9.01 0 0 1 5.204-8.17ZM12 2.496a.75.75 0 0 1 .743.648l.007.102v7.5a.75.75 0 0 1-1.493.102l-.007-.102v-7.5a.75.75 0 0 1 .75-.75Z" fill="currentColor"/></svg>
+                        <span>Shut down</span>
                     </div>
-                    <div class="menu-item" onclick="openApp('Paint','./img/paint.png')">
-                        <img src="./img/paint.png" alt="Paint" onerror="this.src='./img/unknown.png'"><span>Paint</span>
+                    <div class="sm-power-item" onclick="smPowerAction('restart')">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 4.5a7.5 7.5 0 1 1-7.419 6.392c.067-.454-.265-.892-.724-.892a.749.749 0 0 0-.752.623A9 9 0 1 0 6 5.292V4.25a.75.75 0 0 0-1.5 0v3c0 .414.336.75.75.75h3a.75.75 0 0 0 0-1.5H6.9a7.473 7.473 0 0 1 5.1-2Z" fill="currentColor"/></svg>
+                        <span>Restart</span>
                     </div>
-                    <div class="menu-item" onclick="openApp('Calculator','./img/calculator.png')">
-                        <img src="./img/calculator.png" alt="Calc" onerror="this.src='./img/unknown.png'"><span>Calculator</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Browser','./img/chrome.png')">
-                        <img src="./img/chrome.png" alt="Chrome" onerror="this.src='./img/unknown.png'"><span>Chrome</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Terminal','./img/terminal.png')">
-                        <img src="./img/terminal.png" alt="Term" onerror="this.src='./img/unknown.png'"><span>Terminal</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Spotify','./img/spotify.png')">
-                        <img src="./img/spotify.png" alt="Spotify" onerror="this.src='./img/unknown.png'"><span>Spotify</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('TicTacToe','./img/tictactoe.png')">
-                        <img src="./img/tictactoe.png" alt="TicTacToe" onerror="this.src='./img/unknown.png'"><span>TicTacToe</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Minecraft','./img/minecraft.png')">
-                        <img src="./img/minecraft.png" alt="Minecraft" onerror="this.src='./img/unknown.png'"><span>Minecraft</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Quiz','./img/quiz.png')">
-                        <img src="./img/quiz.png" alt="Quiz" onerror="this.src='./img/unknown.png'"><span>Quiz</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Typing','./img/typing.png')">
-                        <img src="./img/typing.png" alt="Typing" onerror="this.src='./img/unknown.png'"><span>Typing</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Cheats++','./img/terminal.png')">
-                        <img src="./img/terminal.png" alt="Cheats++" onerror="this.src='./img/unknown.png'"><span>Cheats++</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('VS Code','./img/vscode.png')">
-                        <img src="./img/vscode.png" alt="VS Code" onerror="this.src='./img/unknown.png'"><span>VS Code</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Snake','./img/snake.png')">
-                        <img src="./img/snake.png" alt="Snake" onerror="this.src='./img/unknown.png'"><span>Snake</span>
-                    </div>
-                                                            <div class="menu-item" onclick="openApp('skribbl.io','./img/skribbl.png')">
-                        <img src="./img/skribbl.png" alt="skribbl.io" onerror="this.src='./img/unknown.png'"><span>skribbl.io</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Geometry Dash Lite','./img/geometrydash.png')">
-                        <img src="./img/geometrydash.png" alt="Geometry Dash Lite" onerror="this.src='./img/unknown.png'"><span>Geometry Dash Lite</span>
-                    </div>
-                    <div class="menu-item" onclick="openApp('Flappy Bird','./img/flappybird.png')">
-                        <img src="./img/flappybird.png" alt="Flappy Bird" onerror="this.src='./img/unknown.png'"><span>Flappy Bird</span>
-                    </div>
-                                    </div>
+                </div>
             </div>
         </div>
 

@@ -2959,14 +2959,238 @@ function handleLockClick() {
     setTimeout(function () { lock.style.display = 'none'; }, 500);
 }
 
+/* ===== Start Menu Data & Logic ===== */
+
+var smPinnedApps = [
+    { name: 'Settings',    icon: './img/settings.png',    app: 'Settings' },
+    { name: 'Files',       icon: './img/files.png',       app: 'Explorer' },
+    { name: 'Notepad',     icon: './img/notepad.png',     app: 'Notepad' },
+    { name: 'Paint',       icon: './img/paint.png',       app: 'Paint' },
+    { name: 'Calculator',  icon: './img/calculator.png',  app: 'Calculator' },
+    { name: 'Chrome',      icon: './img/chrome.png',      app: 'Browser' },
+    { name: 'Terminal',    icon: './img/terminal.png',     app: 'Terminal' },
+    { name: 'Spotify',     icon: './img/spotify.png',      app: 'Spotify' },
+    { name: 'TicTacToe',   icon: './img/tictactoe.png',   app: 'TicTacToe' },
+    { name: 'Minecraft',   icon: './img/minecraft.png',    app: 'Minecraft' },
+    { name: 'Quiz',        icon: './img/quiz.png',         app: 'Quiz' },
+    { name: 'Typing',      icon: './img/typing.png',       app: 'Typing' },
+    { name: 'VS Code',     icon: './img/vscode.png',       app: 'VS Code' },
+    { name: 'Snake',       icon: './img/snake.png',        app: 'Snake' },
+    { name: 'skribbl.io',  icon: './img/skribbl.png',      app: 'skribbl.io' },
+    { name: 'Geometry Dash', icon: './img/geometrydash.png', app: 'Geometry Dash Lite' },
+    { name: 'Flappy Bird', icon: './img/flappybird.png',   app: 'Flappy Bird' },
+    { name: 'Cheats++',    icon: './img/terminal.png',     app: 'Cheats++' }
+];
+
+var smRecentApps = [
+    { name: 'Chrome',     icon: './img/chrome.png',     app: 'Browser',    time: 'Just now' },
+    { name: 'Terminal',   icon: './img/terminal.png',    app: 'Terminal',   time: '2m ago' },
+    { name: 'Settings',   icon: './img/settings.png',    app: 'Settings',   time: '15m ago' },
+    { name: 'Files',      icon: './img/files.png',       app: 'Explorer',   time: '1h ago' },
+    { name: 'Calculator', icon: './img/calculator.png',  app: 'Calculator', time: 'Recently added' },
+    { name: 'Notepad',    icon: './img/notepad.png',     app: 'Notepad',    time: 'Yesterday' }
+];
+
+function smGetAllApps() {
+    var all = smPinnedApps.slice().sort(function (a, b) {
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });
+    return all;
+}
+
+function smRenderPinned() {
+    var grid = document.getElementById('smPinnedGrid');
+    if (!grid) return;
+    var html = '';
+    for (var i = 0; i < smPinnedApps.length; i++) {
+        var a = smPinnedApps[i];
+        html += '<div class="sm-pinned-item" onclick="smOpenApp(\'' + a.app.replace(/'/g, "\\'") + '\',\'' + a.icon + '\')">' +
+            '<img src="' + a.icon + '" alt="' + a.name + '" onerror="this.src=\'./img/unknown.png\'">' +
+            '<span>' + a.name + '</span></div>';
+    }
+    // pad to fill row of 6
+    var rem = (6 - (smPinnedApps.length % 6)) % 6;
+    for (var j = 0; j < rem; j++) {
+        html += '<div class="sm-pinned-item" style="pointer-events:none;visibility:hidden"></div>';
+    }
+    grid.innerHTML = html;
+}
+
+function smRenderRecommended() {
+    var cont = document.getElementById('smRecommended');
+    if (!cont) return;
+    var html = '';
+    for (var i = 0; i < smRecentApps.length; i++) {
+        var a = smRecentApps[i];
+        html += '<div class="sm-rec-item" onclick="smOpenApp(\'' + a.app.replace(/'/g, "\\'") + '\',\'' + a.icon + '\')">' +
+            '<img src="' + a.icon + '" alt="' + a.name + '" onerror="this.src=\'./img/unknown.png\'">' +
+            '<div class="sm-rec-info"><span class="sm-rec-name">' + a.name + '</span>' +
+            '<span class="sm-rec-time">' + a.time + '</span></div></div>';
+    }
+    cont.innerHTML = html;
+}
+
+function smRenderAllApps() {
+    var list = document.getElementById('smAllAppsList');
+    if (!list) return;
+    var apps = smGetAllApps();
+    var html = '';
+    var curLetter = '';
+    for (var i = 0; i < apps.length; i++) {
+        var a = apps[i];
+        var letter = a.name.charAt(0).toUpperCase();
+        if (!/[A-Z]/.test(letter)) letter = '#';
+        if (letter !== curLetter) {
+            curLetter = letter;
+            html += '<div class="sm-allapps-letter">' + curLetter + '</div>';
+        }
+        html += '<div class="sm-allapps-item" onclick="smOpenApp(\'' + a.app.replace(/'/g, "\\'") + '\',\'' + a.icon + '\')">' +
+            '<img src="' + a.icon + '" alt="' + a.name + '" onerror="this.src=\'./img/unknown.png\'">' +
+            '<span>' + a.name + '</span></div>';
+    }
+    list.innerHTML = html;
+}
+
+function smSearch(query) {
+    var box = document.getElementById('smSearchResults');
+    var pinSec = document.getElementById('smPinnedSection');
+    if (!box) return;
+    var q = query.trim().toLowerCase();
+    if (!q) {
+        box.classList.add('hidden');
+        if (pinSec) pinSec.style.display = '';
+        return;
+    }
+    box.classList.remove('hidden');
+    if (pinSec) pinSec.style.display = 'none';
+
+    var apps = smGetAllApps();
+    var filtered = [];
+    for (var i = 0; i < apps.length; i++) {
+        if (apps[i].name.toLowerCase().indexOf(q) !== -1) {
+            filtered.push(apps[i]);
+        }
+    }
+    if (filtered.length === 0) {
+        box.innerHTML = '<div class="sm-no-result">No results found</div>';
+        return;
+    }
+    var html = '';
+    for (var j = 0; j < filtered.length; j++) {
+        var a = filtered[j];
+        html += '<div class="sm-search-item" onclick="smOpenApp(\'' + a.app.replace(/'/g, "\\'") + '\',\'' + a.icon + '\')">' +
+            '<img src="' + a.icon + '" alt="' + a.name + '" onerror="this.src=\'./img/unknown.png\'">' +
+            '<span>' + a.name + '</span></div>';
+    }
+    box.innerHTML = html;
+}
+
+function smToggleAllApps() {
+    var menu = document.getElementById('startMenu');
+    if (!menu) return;
+    var showing = menu.getAttribute('data-show-all') === 'true';
+    menu.setAttribute('data-show-all', showing ? 'false' : 'true');
+    if (!showing) smRenderAllApps();
+}
+
+function smTogglePower(e) {
+    e.stopPropagation();
+    var pm = document.getElementById('smPowerMenu');
+    if (pm) pm.classList.toggle('hidden');
+}
+
+function smShowShutdownOverlay(actionLabel, callback) {
+    // Create full-screen Win11 shutdown overlay
+    var overlay = document.createElement('div');
+    overlay.className = 'shutdown-overlay';
+    overlay.innerHTML = '<div class="shutdown-spinner"></div>' +
+        '<div class="shutdown-text">' + actionLabel + '</div>';
+    document.body.appendChild(overlay);
+    // Trigger animation
+    requestAnimationFrame(function () { overlay.classList.add('active'); });
+    // After 3s animation, call the callback
+    setTimeout(callback, 3000);
+}
+
+function smShowPowerOffScreen() {
+    // Replace page content with black screen + centered start button
+    document.body.innerHTML = '';
+    document.body.style.cssText = 'margin:0;padding:0;background:#000;';
+    var screen = document.createElement('div');
+    screen.className = 'poweroff-screen';
+    screen.innerHTML = '<button class="poweroff-start-btn" onclick="location.reload()">' +
+        '<img src="./img/start.png" width="28" alt="Start">' +
+        '</button>' +
+        '<div class="poweroff-hint">Press Start to boot</div>';
+    document.body.appendChild(screen);
+}
+
+function smPowerAction(action) {
+    var sm = document.getElementById('startMenu');
+    if (sm) sm.classList.add('hidden');
+    var pm = document.getElementById('smPowerMenu');
+    if (pm) pm.classList.add('hidden');
+
+    if (action === 'lock') {
+        var lock = document.getElementById('lockScreen');
+        if (lock) { lock.style.display = ''; lock.classList.remove('unlocking'); }
+    } else if (action === 'sleep') {
+        smShowShutdownOverlay('Sleeping...', function () {
+            smShowPowerOffScreen();
+        });
+    } else if (action === 'shutdown') {
+        smShowShutdownOverlay('Shutting down...', function () {
+            smShowPowerOffScreen();
+        });
+    } else if (action === 'restart') {
+        smShowShutdownOverlay('Restarting...', function () {
+            location.reload();
+        });
+    }
+}
+
+function smOpenApp(appName, iconPath) {
+    var sm = document.getElementById('startMenu');
+    if (sm) sm.classList.add('hidden');
+    smResetView();
+    openApp(appName, iconPath);
+}
+
+function smResetView() {
+    var menu = document.getElementById('startMenu');
+    if (menu) menu.setAttribute('data-show-all', 'false');
+    var searchInput = document.getElementById('smSearchInput');
+    if (searchInput) searchInput.value = '';
+    var searchResults = document.getElementById('smSearchResults');
+    if (searchResults) { searchResults.classList.add('hidden'); searchResults.innerHTML = ''; }
+    var pinSec = document.getElementById('smPinnedSection');
+    if (pinSec) pinSec.style.display = '';
+    var pm = document.getElementById('smPowerMenu');
+    if (pm) pm.classList.add('hidden');
+}
+
+function smToggle() {
+    var sm = document.getElementById('startMenu');
+    if (!sm) return;
+    if (sm.classList.contains('hidden')) {
+        smResetView();
+        smRenderPinned();
+        smRenderRecommended();
+        sm.classList.remove('hidden');
+    } else {
+        sm.classList.add('hidden');
+    }
+}
+
 // Start menu: toggle on button click, close on any outside click
 document.getElementById('startBtn').onclick = function (e) {
     e.stopPropagation();
-    document.getElementById('startMenu').classList.toggle('hidden');
+    smToggle();
 };
 
 document.onclick = function (e) {
-    document.getElementById('startMenu').classList.add('hidden');
+    var sm = document.getElementById('startMenu');
+    if (sm && !sm.contains(e.target)) sm.classList.add('hidden');
 
     // Close action center and calendar if clicking outside
     var ac = document.getElementById('actionCenter');
