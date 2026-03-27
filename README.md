@@ -1,112 +1,115 @@
 # 🪟 WinOS
 
-**Windows 11 — Recreated in the Browser**
+**Windows 11 rebuilt from scratch in the browser.**
 
-A faithful recreation of the Windows 11 desktop experience built entirely with vanilla HTML, CSS, and JavaScript. No frameworks, no build tools — just open `index.html` and go.
+I made this as a love letter to Windows 11. I wanted to recreate the desktop experience using just HTML, CSS and JavaScript. I did not use React or any other frameworks. I did not even use a build pipeline. You can just open the `index.html` file. It will work.
 
-## ✨ Features
+---
 
-### Desktop & Window Management
-- **Desktop Icons** — 18 launchable apps arranged on the desktop
-- **Draggable Windows** — click-to-focus, minimize, maximize/restore, close
-- **Taskbar** — centered app launcher icons with running-app indicators
-- **Start Menu** — overlay with app grid, search, and user controls
-- **Right-click Context Menu** — desktop context menu with personalization options
-- **Wallpaper Switcher** — changeable wallpapers via Settings or context menu
+## What's inside
 
-### Windows 11 File Explorer
-- **Ribbon Toolbar** — New, Cut, Copy, Paste, Rename, Share, Sort, View buttons with Win11 icons
-- **Navigation Toolbar** — Back, Forward, Up buttons with history tracking, editable address bar, live search
-- **Navigation Pane** — collapsible sidebar tree with Quick Access, Desktop, Downloads, Documents, Pictures, Music, Videos, OneDrive, and This PC
-- **File Grid** — medium icon view with proper Win11 folder/file icons
-- **Virtual File System** — full directory tree (C: drive) with folders, text files, shortcuts, and executables
-- **Breadcrumb Navigation** — clickable address bar with forward/back history
-- **Keyboard Shortcuts** — Backspace (go up), Alt+Left/Right (back/forward)
-- **In-folder Search** — real-time filter as you type
-- **Status Bar** — item count and view toggle
+### The desktop stuff you'd expect
 
-### Action Center (Quick Settings)
-- **Quick Toggles** — Wi-Fi, Bluetooth, Flight Mode, Battery Saver, Night Light, Location
-- **Brightness Slider** — adjusts page brightness via CSS filter
-- **Volume Slider** — visual volume control with dynamic audio icon
-- **Night Light** — warm-tone filter applied across the entire page
-- **Battery Status** — real battery level via the Web Battery API (where supported)
-- **Taskbar System Tray** — WiFi, audio, and battery icons that reflect current state
+You get a desktop where you can drag windows around minimize them maximize them and close them. There is a taskbar that shows which apps are running. There is a Start Menu where you can search for apps. You can also right-click on things to get a menu.. You can even change your wallpaper. It feels like Windows because it is basically Windows,. It is running in a web browser.
 
-### Calendar Panel
-- **Live Clock** — synced time and date display
-- **Month Grid** — full calendar with today highlighted
+### A deep File Explorer
 
-### Built-in Apps
-| App | Description |
+This took me a while to make. The File Explorer has a toolbar with lots of options. You can go back and forward. Even type in the address bar. There is a sidebar with access to your files and folders. And there is a virtual C: drive where you can store your files. You can use keyboard shortcuts like Backspace to go up a folder and Alt+Arrow to navigate through your history.
+
+### Action Center & Quick Settings
+
+If you click on the system tray you can turn Wi-Fi, Bluetooth and other things on and off. You can also adjust the brightness and volume. The brightness actually works by using a CSS filter.. The Night Light feature adds a warm tone to everything. The battery level is even pulled from the Web Battery API.
+
+### 18 built-in apps
+
+| App | What it does |
+
 |-----|-------------|
-| 📝 Notepad | Text editor with open/save support for VFS files |
-| 🧮 Calculator | Fully functional calculator |
-| 📁 Explorer | Windows 11-style file browser (see above) |
-| 🌐 Browser | Embedded web browser (iframe) |
-| 🖥️ Terminal | Command-line interface with `cd`, `dir`, `cls`, `help` |
-| ⚙️ Settings | System info and wallpaper customization |
-| 🎨 Paint | Canvas-based drawing app |
-| 🎵 Spotify | Embedded Spotify web player |
-| ❌⭕ TicTacToe | Classic two-player game |
-| ⛏️ Minecraft | Embedded Minecraft Classic |
-| ❓ Quiz | Interactive quiz game |
-| ⌨️ Typing | Typing speed test |
-| 💻 Cheats++ | Built-in cheat utility |
-| 🐍 Snake | Classic Snake game |
-| 🆚 VS Code | Embedded VS Code for the Web |
-| 🎨 skribbl.io | Multiplayer drawing game |
-| 🟦 Geometry Dash | Lite version embedded |
-| 🐦 Flappy Bird | Embedded Flappy Bird clone |
 
-## 🛠️ Tech Stack
+📝 Notepad | A text editor where you can save files |
 
-- **HTML5** — semantic layout, SVG icons
-- **CSS3** — glassmorphism (`backdrop-filter`), CSS Grid, Flexbox, animations, range input styling
-- **Vanilla JavaScript** — zero dependencies, DOM manipulation, drag-and-drop, virtual file system, Battery API integration
-- **Assets** — Win11-style icons from [win11React](https://github.com/nicedayinn/win11React) (51 icon assets)
+🧮 Calculator | A fully working calculator |
 
-## 📁 Project Structure
+| 📁 Explorer. The deep file browser I described above |
 
-```
-WinOS/
-├── index.html          # Main HTML — desktop, taskbar, panels
-├── script.js           # All application logic (2700+ lines)
-├── style.css           # All styling (2000+ lines)
-└── img/
-    ├── icon/
-    │   ├── ui/         # 26 UI icons (wifi, bluetooth, audio, etc.)
-    │   └── win/        # 25 Windows folder/file icons
-    └── wallpapers/     # Desktop wallpaper images
-```
+| 🌐 Browser | A web browser that is embedded in the app |
 
-## 🚀 Getting Started
+| 🖥️ Terminal | A command line interface where you can type commands |
 
-No build step required. Clone and open:
+| ⚙ Settings | A place where you can see system info and change your wallpaper |
+
+| 🎨 Paint A drawing app where you can make art |
+
+| 🎵 Spotify | A music player that is embedded right in the app |
+
+❌⭕ TicTacToe | A game of Tic Tac Toe that you can play with a friend |
+
+| ⛏ Minecraft | A version of Minecraft that you can play right in the app |
+
+| ❓ Quiz | A quiz game that you can play to test your knowledge |
+
+| ⌨️ Typing | A typing speed test where you can see how fast you can type |
+
+| 💻 Cheats++ | A utility that gives you cheats for games |
+
+| 🐍 Snake | A game of Snake |
+
+| 🆚 VS Code | A version of the VS Code editor that you can use right in the app
+
+| 🎨 skribbl.io | A drawing game that you can play with people |
+
+| 🟦 Geometry Dash | A version of the game Geometry Dash that you can play right in the app |
+
+| 🐦 Flappy Bird A version of the game Flappy Bird that you can play right in the app |
+
+---
+
+## Tech stack
+
+I used only the basics to make this. I used HTML5 to structure everything CSS3 to make it look nice and JavaScript to make it all work. I did not use any frameworks or dependencies. The icons are from the Win11React project.
+
+---
+
+## Getting started
+
+You do not need to do anything to get started. You can just clone the repository. Open the `index.html` file.
 
 ```bash
+
 git clone https://github.com/AnupSharma12/WinOS.git
+
 cd WinOS
+
 ```
 
-Then either:
-- Double-click `index.html` in your file manager
-- Or serve locally: `npx http-server .` and open `http://localhost:8080`
+Then you can just open the `index.html` file in your web browser. If you need to use iframes you can use a server to run it.
 
-## 🤝 Contributing
+```bash
 
-Contributions are welcome! Feel free to check the [issues page](https://github.com/AnupSharma12/WinOS/issues).
+npx http-server.
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/NewApp`)
-3. Commit your changes (`git commit -m 'Add new custom App'`)
-4. Push to the branch (`git push origin feature/NewApp`)
-5. Open a Pull Request
+# open http://localhost:8080
 
-## 📄 License
+```
 
-This project is open source.
+---
 
-## 📝 License
+## Contributing
 
-This project is open-source and free to use.
+If you find a bug or have an idea, for an app you can contribute to the project.
+
+1. Fork the repository
+
+2. Create a branch: `git checkout -b feature/NewApp`
+
+3. Commit your changes: `git commit -m 'Add custom App'`
+
+4. Push your changes. Open a Pull Request
+
+You can check the issues page to see what needs to be done.
+
+---
+
+## License
+
+This project is source and free to use.
